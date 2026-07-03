@@ -1,0 +1,144 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+  line-height: 1;
+}
+
+.button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.4);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.button--sm {
+  height: 2rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+.button--md {
+  height: 2.5rem;
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+
+.button--lg {
+  height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 1.125rem;
+}
+
+.button--primary {
+  background: linear-gradient(135deg, #00FF88, #00cc6a);
+  color: #000000;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+.button--primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  transition: none;
+  pointer-events: none;
+}
+
+.button--primary:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.4);
+  transform: translateY(-1px);
+}
+
+.button--primary:hover:not(:disabled)::after {
+  animation: btn-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes btn-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.button--primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button--secondary {
+  background: rgba(10, 25, 47, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  color: #f0f0f0;
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: rgba(10, 25, 47, 0.9);
+  border-color: rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.15);
+}
+
+.button--danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.button--danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+}
+
+.button--ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.button--ghost:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.05);
+  color: #00FF88;
+}
+
+.button--outline {
+  background: transparent;
+  border-color: rgba(0, 255, 136, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.button--outline:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.05);
+  border-color: rgba(0, 255, 136, 0.4);
+  color: #00FF88;
+}
+
+.button--full {
+  width: 100%;
+}
+
+.button__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 9999px;
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}

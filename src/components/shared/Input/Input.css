@@ -1,0 +1,95 @@
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.input__container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input__field {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  background: rgba(10, 25, 47, 0.5);
+  border: 1px solid rgba(0, 255, 136, 0.15);
+  border-radius: 16px;
+  color: #f0f0f0;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.input__field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input__field:focus {
+  border-color: #00FF88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.15), inset 0 0 0 1px rgba(0, 255, 136, 0.2);
+  background: rgba(10, 25, 47, 0.7);
+}
+
+.input__field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input__field--error {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.input__field--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
+}
+
+.input__field--success {
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.input__field--success:focus {
+  border-color: #00FF88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.15);
+}
+
+.input__toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+}
+
+.input__toggle-password:hover {
+  color: #00FF88;
+}
+
+.input__error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.125rem;
+}
+
+.input__helper {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.125rem;
+}

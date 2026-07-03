@@ -1,0 +1,125 @@
+.suspended-account {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.suspended-account__card {
+  max-width: 28rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(10, 25, 47, 0.8),
+    rgba(2, 12, 26, 0.95));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 32px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(0, 255, 136, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.suspended-account__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+    rgba(0, 255, 136, 0.15) 0%,
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.1s;
+  pointer-events: none;
+}
+
+.suspended-account__card:hover::before {
+  opacity: 1;
+}
+
+.suspended-account__icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.suspended-account__icon-svg {
+  width: 2rem;
+  height: 2rem;
+  color: #ef4444;
+}
+
+.suspended-account__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  margin: 0;
+}
+
+.suspended-account__message {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.suspended-account__support {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0;
+}
+
+.suspended-account__support-email {
+  color: #00FF88;
+  text-decoration: none;
+  transition: text-shadow 0.2s ease;
+}
+
+.suspended-account__support-email:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+.suspended-account__divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+  margin: 0.5rem 0;
+}
+
+.suspended-account__logout {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suspended-account__logout:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.2);
+}
+
+.suspended-account__logout:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
