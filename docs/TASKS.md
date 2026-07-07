@@ -104,18 +104,18 @@
 >
 > **Nota:** `Category` entity e `ICategoryRepository` ya creados en Fase 0.
 
-- [ ] **4.1** Crear `src/infrastructure/repositories/CategoryRepositoryImpl.ts`
-- [ ] **4.2** Crear `src/use-cases/category/useCategoryList.ts` — paginado, incluye categorías globales + propias
-- [ ] **4.3** Crear `src/use-cases/category/useCreateCategory.ts`
-- [ ] **4.4** Crear `src/use-cases/category/useUpdateCategory.ts`
-- [ ] **4.5** Crear `src/use-cases/category/useDeleteCategory.ts`
-- [ ] **4.6** Crear `src/use-cases/category/useCategorySearch.ts` — búsqueda fuzzy por nombre
-- [ ] **4.7** Crear `src/components/category/CategoryList/` — tabla paginada con acciones
-- [ ] **4.8** Crear `src/components/category/CategoryForm/` — formulario con type, flowDirection, isVariable, isCogs
-- [ ] **4.9** Crear `src/components/category/CategorySelect/` — dropdown con búsqueda fuzzy
-- [ ] **4.10** Crear `app/(private)/companies/[companyId]/categories/page.tsx`
-- [ ] **4.11** Crear `app/(private)/companies/[companyId]/categories/new/page.tsx`
-- [ ] **4.12** Crear `app/(private)/companies/[companyId]/categories/[categoryId]/edit/page.tsx`
+- [x] **4.1** Crear `src/infrastructure/repositories/CategoryRepositoryImpl.ts`
+- [x] **4.2** Crear `src/use-cases/category/useCategoryList.ts` — paginado, incluye categorías globales + propias
+- [x] **4.3** Crear `src/use-cases/category/useCreateCategory.ts`
+- [x] **4.4** Crear `src/use-cases/category/useUpdateCategory.ts`
+- [x] **4.5** Crear `src/use-cases/category/useDeleteCategory.ts`
+- [x] **4.6** Crear `src/use-cases/category/useCategorySearch.ts` — búsqueda fuzzy por nombre
+- [x] **4.7** Crear `src/components/category/CategoryList/` — tabla paginada con acciones
+- [x] **4.8** Crear `src/components/category/CategoryForm/` — formulario con type, flowDirection, isVariable, isCogs
+- [x] **4.9** Crear `src/components/category/CategorySelect/` — dropdown con búsqueda fuzzy
+- [x] **4.10** Crear `app/(private)/companies/[companyId]/categories/page.tsx`
+- [x] **4.11** Crear `app/(private)/companies/[companyId]/categories/new/page.tsx`
+- [x] **4.12** Crear `app/(private)/companies/[companyId]/categories/[categoryId]/edit/page.tsx`
 
 ---
 

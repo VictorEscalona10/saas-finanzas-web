@@ -19,6 +19,7 @@ export interface UpdateCategoryDto {
 }
 
 export interface ICategoryRepository {
+  getById(companyId: string, categoryId: string): Promise<Category>;
   list(companyId: string, page?: number, limit?: number): Promise<PaginatedResult<Category>>;
   create(companyId: string, data: CreateCategoryDto): Promise<Category>;
   update(companyId: string, categoryId: string, data: UpdateCategoryDto): Promise<Category>;
