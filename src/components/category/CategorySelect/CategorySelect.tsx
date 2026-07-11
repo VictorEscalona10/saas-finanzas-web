@@ -23,12 +23,18 @@ export default function CategorySelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [allLoading, setAllLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { searchCategory, result, loading } = useCategorySearch();
+  const { searchCategory, listCategories, result, loading } = useCategorySearch();
   const items = useMemo(() => result?.items ?? [], [result?.items]);
+
+  const displayItems = query.trim() ? items : allCategories;
+  const isListLoading = allLoading && !query.trim();
+  const isSearchLoading = query.trim() && loading;
 
   const handleSearch = useCallback((term: string) => {
     setQuery(term);
@@ -42,6 +48,14 @@ export default function CategorySelect({
       searchCategory(term, companyId);
     }, DEBOUNCE_MS) as ReturnType<typeof setTimeout>;
   }, [companyId, searchCategory]);
+
+  const loadAllCategories = useCallback(async () => {
+    if (allCategories.length > 0) return;
+    setAllLoading(true);
+    const result = await listCategories(companyId);
+    if (result) setAllCategories(result.items);
+    setAllLoading(false);
+  }, [companyId, listCategories, allCategories.length]);
 
   const selectItem = useCallback((cat: Category) => {
     onChange(cat);
@@ -57,8 +71,9 @@ export default function CategorySelect({
 
   const openDropdown = useCallback(() => {
     setOpen(true);
+    loadAllCategories();
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, []);
+  }, [loadAllCategories]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!open) {
@@ -75,7 +90,7 @@ export default function CategorySelect({
         e.preventDefault();
         break;
       case 'ArrowDown':
-        setHighlightedIndex((prev) => Math.min(prev + 1, items.length - 1));
+        setHighlightedIndex((prev) => Math.min(prev + 1, displayItems.length - 1));
         e.preventDefault();
         break;
       case 'ArrowUp':
@@ -83,13 +98,13 @@ export default function CategorySelect({
         e.preventDefault();
         break;
       case 'Enter':
-        if (highlightedIndex >= 0 && highlightedIndex < items.length) {
-          selectItem(items[highlightedIndex]);
+        if (highlightedIndex >= 0 && highlightedIndex < displayItems.length) {
+          selectItem(displayItems[highlightedIndex]);
         }
         e.preventDefault();
         break;
     }
-  }, [open, items, highlightedIndex, selectItem, openDropdown]);
+  }, [open, displayItems, highlightedIndex, selectItem, openDropdown]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -125,14 +140,16 @@ export default function CategorySelect({
         )}
 
         {value && (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             className="category-select__clear-btn"
             onClick={(e) => { e.stopPropagation(); clearSelection(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); clearSelection(); } }}
             aria-label="Limpiar selección"
           >
             <span className="material-symbols-outlined" style={{ fontSize: '0.875rem' }}>close</span>
-          </button>
+          </span>
         )}
 
         <span className={`material-symbols-outlined category-select__trigger-icon${open ? ' category-select__trigger-icon--open' : ''}`}>
@@ -156,7 +173,7 @@ export default function CategorySelect({
             </div>
           </div>
 
-          {loading ? (
+          {isListLoading || isSearchLoading ? (
             <div className="category-select__loading">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="category-select__loading-item">
@@ -168,20 +185,20 @@ export default function CategorySelect({
                 </div>
               ))}
             </div>
-          ) : query.trim() && items.length === 0 ? (
+          ) : query.trim() && items.length === 0 && !loading ? (
             <div className="category-select__empty">
               <span className="material-symbols-outlined category-select__empty-icon">search_off</span>
               <p className="category-select__empty-text">No se encontraron categorías para...</p>
               <p className="category-select__empty-term">&quot;{query}&quot;</p>
             </div>
-          ) : !query.trim() ? (
+          ) : displayItems.length === 0 && !loading ? (
             <div className="category-select__idle">
               <span className="material-symbols-outlined category-select__idle-icon">search</span>
               <p className="category-select__idle-text">Escribe para buscar categorías...</p>
             </div>
           ) : (
             <div className="category-select__results">
-              {items.map((cat, index) => (
+              {displayItems.map((cat, index) => (
                 <div
                   key={cat.id}
                   className={`category-select__option${index === highlightedIndex ? ' category-select__option--highlighted' : ''}`}

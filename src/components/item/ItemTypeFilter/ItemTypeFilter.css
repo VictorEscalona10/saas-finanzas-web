@@ -1,0 +1,33 @@
+.item-type-filter {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+}
+
+.item-type-filter__btn {
+  flex: 1;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.6);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.item-type-filter__btn:hover {
+  color: #dae6d8;
+}
+
+.item-type-filter__btn--active {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  font-weight: 700;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}

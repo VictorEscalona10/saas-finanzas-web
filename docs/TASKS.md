@@ -125,18 +125,18 @@
 >
 > **Nota:** `Item` entity e `IItemRepository` ya creados en Fase 0.
 
-- [ ] **5.1** Crear `src/infrastructure/repositories/ItemRepositoryImpl.ts`
-- [ ] **5.2** Crear `src/use-cases/item/useItemList.ts` — con filtro por tipo (PRODUCT/SERVICE/all)
-- [ ] **5.3** Crear `src/use-cases/item/useCreateItem.ts` — batch create
-- [ ] **5.4** Crear `src/use-cases/item/useUpdateItem.ts`
-- [ ] **5.5** Crear `src/use-cases/item/useDeleteItem.ts`
-- [ ] **5.6** Crear `src/use-cases/item/useItemSearch.ts` — búsqueda fuzzy por nombre
-- [ ] **5.7** Crear `src/components/item/ItemList/` — tabla paginada con filtro por tipo
-- [ ] **5.8** Crear `src/components/item/ItemForm/` — formulario con name, type, basePrice, stockCurrent
-- [ ] **5.9** Crear `src/components/item/ItemTypeFilter/` — tabs o dropdown para filtrar PRODUCT/SERVICE
-- [ ] **5.10** Crear `app/(private)/companies/[companyId]/items/page.tsx`
-- [ ] **5.11** Crear `app/(private)/companies/[companyId]/items/new/page.tsx`
-- [ ] **5.12** Crear `app/(private)/companies/[companyId]/items/[itemId]/edit/page.tsx`
+- [x] **5.1** Crear `src/infrastructure/repositories/ItemRepositoryImpl.ts`
+- [x] **5.2** Crear `src/use-cases/item/useItemList.ts` — con filtro por tipo (PRODUCT/SERVICE/all)
+- [x] **5.3** Crear `src/use-cases/item/useCreateItem.ts` — batch create
+- [x] **5.4** Crear `src/use-cases/item/useUpdateItem.ts`
+- [x] **5.5** Crear `src/use-cases/item/useDeleteItem.ts`
+- [x] **5.6** Crear `src/use-cases/item/useItemSearch.ts` — búsqueda fuzzy por nombre
+- [x] **5.7** Crear `src/components/item/ItemList/` — tabla paginada con filtro por tipo
+- [x] **5.8** Crear `src/components/item/ItemForm/` — formulario con name, type, basePrice, stockCurrent
+- [x] **5.9** Crear `src/components/item/ItemTypeFilter/` — tabs o dropdown para filtrar PRODUCT/SERVICE
+- [x] **5.10** Crear `app/(private)/companies/[companyId]/items/page.tsx`
+- [x] **5.11** Crear `app/(private)/companies/[companyId]/items/new/page.tsx`
+- [x] **5.12** Crear `app/(private)/companies/[companyId]/items/[itemId]/edit/page.tsx`
 
 ---
 
@@ -146,21 +146,21 @@
 >
 > **Nota:** `Transaction` entity e `ITransactionRepository` ya creados en Fase 0.
 
-- [ ] **6.1** Crear `src/infrastructure/repositories/TransactionRepositoryImpl.ts`
-- [ ] **6.2** Crear `src/use-cases/transaction/useTransactionList.ts` — paginado
-- [ ] **6.3** Crear `src/use-cases/transaction/useCreateTransaction.ts` — batch create
-- [ ] **6.4** Crear `src/use-cases/transaction/useUpdateTransaction.ts`
-- [ ] **6.5** Crear `src/use-cases/transaction/useDeleteTransaction.ts`
-- [ ] **6.6** Crear `src/use-cases/transaction/useTransactionByDateRange.ts`
-- [ ] **6.7** Crear `src/use-cases/transaction/useTransactionByDateCategory.ts`
-- [ ] **6.8** Crear `src/use-cases/transaction/useTransactionById.ts`
-- [ ] **6.9** Crear `src/components/transaction/TransactionList/` — tabla paginada con categoría, item, montos USD/Bs
-- [ ] **6.10** Crear `src/components/transaction/TransactionForm/` — formulario con selector de categoría (fuzzy), item, currency toggle, amount, dollarRate, paymentMethod
-- [ ] **6.11** Crear `src/components/transaction/TransactionFilters/` — filtros por fecha, categoría, estado
-- [ ] **6.12** Crear `app/(private)/companies/[companyId]/transactions/page.tsx`
-- [ ] **6.13** Crear `app/(private)/companies/[companyId]/transactions/new/page.tsx`
-- [ ] **6.14** Crear `app/(private)/companies/[companyId]/transactions/[transactionId]/edit/page.tsx`
-- [ ] **6.15** Crear `app/(private)/companies/[companyId]/transactions/[transactionId]/page.tsx` — detalle
+- [x] **6.1** Crear `src/infrastructure/repositories/TransactionRepositoryImpl.ts`
+- [x] **6.2** Crear `src/use-cases/transaction/useTransactionList.ts` — paginado
+- [x] **6.3** Crear `src/use-cases/transaction/useCreateTransaction.ts` — batch create
+- [x] **6.4** Crear `src/use-cases/transaction/useUpdateTransaction.ts`
+- [x] **6.5** Crear `src/use-cases/transaction/useDeleteTransaction.ts`
+- [x] **6.6** Crear `src/use-cases/transaction/useTransactionByDateRange.ts`
+- [x] **6.7** Crear `src/use-cases/transaction/useTransactionByDateCategory.ts`
+- [x] **6.8** Crear `src/use-cases/transaction/useTransactionById.ts`
+- [x] **6.9** Crear `src/components/transaction/TransactionList/` — tabla paginada con categoría, item, montos USD/Bs
+- [x] **6.10** Crear `src/components/transaction/TransactionForm/` — formulario con selector de categoría (fuzzy), item, currency toggle, amount, dollarRate, paymentMethod
+- [x] **6.11** Crear `src/components/transaction/TransactionFilters/` — filtros por fecha, categoría, estado
+- [x] **6.12** Crear `app/(private)/(app)/[companyId]/transactions/page.tsx` — listado con CRUD inline (TransactionList + TransactionForm en drawer/modal, detalle en modal)
+- [ ] **6.13** ~~Crear `app/(private)/companies/[companyId]/transactions/new/page.tsx`~~ → se hace inline en 6.12
+- [ ] **6.14** ~~Crear `app/(private)/companies/[companyId]/transactions/[transactionId]/edit/page.tsx`~~ → se hace inline en 6.12
+- [ ] **6.15** ~~Crear `app/(private)/companies/[companyId]/transactions/[transactionId]/page.tsx`~~ → se hace inline en 6.12
 
 ---
 

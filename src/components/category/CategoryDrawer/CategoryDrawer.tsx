@@ -10,9 +10,10 @@ interface CategoryDrawerProps {
   subtitle?: string;
   children: ReactNode;
   footer?: ReactNode;
+  disableClose?: boolean;
 }
 
-export default function CategoryDrawer({ open, onClose, title, subtitle, children, footer }: CategoryDrawerProps) {
+export default function CategoryDrawer({ open, onClose, title, subtitle, children, footer, disableClose }: CategoryDrawerProps) {
   const [mounted, setMounted] = useState(false);
   const [animate, setAnimate] = useState<'entering' | 'entered'>('entering');
 
@@ -34,15 +35,15 @@ export default function CategoryDrawer({ open, onClose, title, subtitle, childre
   useEffect(() => {
     if (!open) return;
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !disableClose) onClose();
     };
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
-  }, [open, onClose]);
+  }, [open, onClose, disableClose]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose();
-  }, [onClose]);
+    if (e.target === e.currentTarget && !disableClose) onClose();
+  }, [onClose, disableClose]);
 
   if (!mounted) return null;
 
@@ -58,7 +59,7 @@ export default function CategoryDrawer({ open, onClose, title, subtitle, childre
             <h2 className="category-drawer__title">{title}</h2>
             {subtitle && <p className="category-drawer__subtitle">{subtitle}</p>}
           </div>
-          <button className="category-drawer__close" onClick={onClose} aria-label="Cerrar">
+          <button className="category-drawer__close" onClick={onClose} aria-label="Cerrar" disabled={disableClose}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/src/use-cases/auth/useSession';
 import { useLogout } from '@/src/use-cases/auth/useLogout';
+import { useDollarRateContext } from '@/src/shared/contexts/DollarRateContext';
 import type { Company } from '@/src/domain/entities/Company';
 import './Header.css';
 
@@ -30,6 +31,7 @@ export default function Header({
   const [companyOpen, setCompanyOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const companyRef = useRef<HTMLDivElement>(null);
+  const { dollarRate, isLoading: rateLoading, source } = useDollarRateContext();
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -95,7 +97,7 @@ export default function Header({
                 ))}
                 <div className="header__company-divider" />
                 <Link
-                  href="/companies"
+                  href={`/companies?selected=${companyId}`}
                   className="header__company-item header__company-item--config"
                   onClick={() => setCompanyOpen(false)}
                 >
@@ -108,10 +110,12 @@ export default function Header({
         )}
 
         <div className="header__nav-items">
-          <div className="header__dollar-rate">
-            <span className="material-symbols-outlined header__dollar-icon">currency_exchange</span>
+          <div className={`header__dollar-rate${source === 'manual' ? ' header__dollar-rate--manual' : ''}`}>
+            <span className="material-symbols-outlined header__dollar-icon">
+              {source === 'manual' ? 'edit_note' : 'currency_exchange'}
+            </span>
             <span className="header__dollar-label">USD/VES</span>
-            <span className="header__dollar-value">36.52</span>
+            <span className="header__dollar-value">{rateLoading ? '...' : dollarRate?.promedio?.toFixed(2) ?? '—'}</span>
           </div>
           <button className="header__nav-btn" type="button">
             <span className="material-symbols-outlined header__nav-btn-icon">support</span>

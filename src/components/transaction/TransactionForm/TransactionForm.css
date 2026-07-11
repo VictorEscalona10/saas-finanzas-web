@@ -1,0 +1,362 @@
+.transaction-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.transaction-form__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.transaction-form__section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(185, 203, 185, 0.5);
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transaction-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.transaction-form__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(185, 203, 185, 0.8);
+}
+
+.transaction-form__input {
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: #d6e3ff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transaction-form__input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.transaction-form__input--with-prefix {
+  padding-left: 2.5rem;
+}
+
+.transaction-form__select {
+  height: 2.75rem;
+  padding: 0 2.5rem 0 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: #d6e3ff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  appearance: none;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.transaction-form__select:focus {
+  outline: none;
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.transaction-form__select option {
+  background: #112036;
+  color: #d6e3ff;
+}
+
+.transaction-form__select-wrapper {
+  position: relative;
+}
+
+.transaction-form__select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(185, 203, 185, 0.5);
+  pointer-events: none;
+  font-size: 1.25rem;
+}
+
+.transaction-form__input-group {
+  position: relative;
+}
+
+.transaction-form__input-prefix {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64ffda;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  pointer-events: none;
+}
+
+.transaction-form__input-prefix--bs {
+  color: #fbbf24;
+}
+
+.transaction-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .transaction-form__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.transaction-form__status-toggle {
+  display: flex;
+  gap: 0.25rem;
+  height: 2.75rem;
+}
+
+.transaction-form__status-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(185, 203, 185, 0.6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-form__status-btn:first-child {
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.transaction-form__status-btn:last-child {
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.transaction-form__status-btn:not(:last-child) {
+  border-right: none;
+}
+
+.transaction-form__status-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #d6e3ff;
+}
+
+.transaction-form__status-btn--active {
+  color: #d6e3ff;
+}
+
+.transaction-form__status-btn--completed.transaction-form__status-btn--active {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.3);
+  color: #64ffda;
+}
+
+.transaction-form__status-btn--pending.transaction-form__status-btn--active {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+}
+
+.transaction-form__textarea {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: #d6e3ff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 5rem;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transaction-form__textarea:focus {
+  outline: none;
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.transaction-form__error {
+  font-size: 0.8125rem;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.transaction-form__item-search {
+  position: relative;
+}
+
+.transaction-form__item-input-wrapper {
+  position: relative;
+}
+
+.transaction-form__item-input {
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: #d6e3ff;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transaction-form__item-input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 136, 0.5);
+}
+
+.transaction-form__item-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.5);
+  cursor: pointer;
+  border-radius: 9999px;
+}
+
+.transaction-form__item-clear:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #d6e3ff;
+}
+
+.transaction-form__item-dropdown {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  background: rgba(17, 32, 54, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.transaction-form__item-dropdown-loading {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.transaction-form__item-skeleton {
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.transaction-form__item-dropdown-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: rgba(185, 203, 185, 0.5);
+  font-size: 0.875rem;
+  justify-content: center;
+}
+
+.transaction-form__item-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: #d6e3ff;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.transaction-form__item-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.transaction-form__item-option-name {
+  font-weight: 500;
+}
+
+.transaction-form__item-option-type {
+  font-size: 0.75rem;
+  color: rgba(185, 203, 185, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.transaction-form__footer {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.transaction-form__input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+  cursor: pointer;
+}
+
+.transaction-form__input--error {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.transaction-form__stock-label {
+  font-size: 0.8125rem;
+  color: rgba(185, 203, 185, 0.7);
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.375rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.transaction-form__stock-value {
+  color: #64ffda;
+  font-weight: 600;
+}

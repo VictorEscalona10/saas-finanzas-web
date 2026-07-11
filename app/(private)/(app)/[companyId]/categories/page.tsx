@@ -13,6 +13,7 @@ export default function CategoriesPage() {
   const companyId = params.companyId;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const handleNew = useCallback(() => {
     setDrawerOpen(true);
@@ -43,11 +44,12 @@ export default function CategoriesPage() {
       <CategoryDrawer
         open={drawerOpen}
         onClose={handleCancel}
+        disableClose={saving}
         title="Nueva Categoría"
         subtitle="Define la estructura de tus flujos financieros"
         footer={
           <>
-            <Button variant="outline" size="lg" onClick={handleCancel}>
+            <Button variant="outline" size="lg" onClick={handleCancel} disabled={saving}>
               Cancelar
             </Button>
             <Button
@@ -55,8 +57,9 @@ export default function CategoriesPage() {
               size="lg"
               type="submit"
               form="category-form"
+              loading={saving}
             >
-              Guardar Categoría
+              {saving ? 'Guardando...' : 'Guardar Categoría'}
             </Button>
           </>
         }
@@ -67,6 +70,7 @@ export default function CategoriesPage() {
           onCancel={handleCancel}
           id="category-form"
           hideFooter
+          onLoadingChange={setSaving}
         />
       </CategoryDrawer>
     </>

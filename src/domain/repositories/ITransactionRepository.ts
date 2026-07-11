@@ -7,7 +7,8 @@ export interface CreateTransactionDto {
   batchId?: string;
   quantity?: number;
   unitPrice?: number;
-  amount: number;
+  amountUSD: number;
+  amountBs: number;
   dollarRate: number;
   status: TransactionStatus;
   paymentMethod: PaymentMethod;
@@ -23,7 +24,8 @@ export interface UpdateTransactionDto {
   batchId?: string;
   quantity?: number;
   unitPrice?: number;
-  amount?: number;
+  amountUSD?: number;
+  amountBs?: number;
   dollarRate?: number;
   status?: TransactionStatus;
   paymentMethod?: PaymentMethod;

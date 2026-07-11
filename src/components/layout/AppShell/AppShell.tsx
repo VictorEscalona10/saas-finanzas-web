@@ -7,6 +7,7 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import Header from '@/src/components/layout/Header';
 import { useCompany } from '@/src/use-cases/company/useCompany';
 import { useMyCompanies } from '@/src/use-cases/company/useMyCompanies';
+import { DollarRateProvider, useDollarRateContext } from '@/src/shared/contexts/DollarRateContext';
 import './AppShell.css';
 
 interface NavItem {
@@ -18,7 +19,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
   { label: 'Categories', href: '/categories', icon: 'category' },
-  { label: 'Products', href: '/products', icon: 'inventory_2' },
+  { label: 'Items', href: '/items', icon: 'inventory_2' },
   { label: 'Transactions', href: '/transactions', icon: 'receipt_long' },
   { label: 'Production Batches', href: '/batches', icon: 'precision_manufacturing' },
   { label: 'Cash Flow', href: '/cash-flow', icon: 'payments' },
@@ -29,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Unit Cost', href: '/unit-cost', icon: 'request_quote' },
   { label: 'Price with Margin', href: '/price-margin', icon: 'sell' },
   { label: 'AI Financial Chat', href: '/finance-chat', icon: 'smart_toy' },
+  { label: 'Tasa del Dólar', href: '/dollar-rate', icon: 'currency_exchange' },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -36,6 +38,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const companyId = params.companyId as string;
+  const hasCompany = !!companyId;
 
   const { company } = useCompany(companyId);
   const { companies } = useMyCompanies();
@@ -62,6 +65,53 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return () => el.removeEventListener('mousemove', handler);
   }, []);
 
+  const handleCompanySwitch = (id: string) => {
+    router.push(`/${id}/dashboard`);
+  };
+
+  return (
+    <DollarRateProvider companyId={companyId}>
+      <div className="app-shell">
+        <Header
+          onToggleSidebar={toggleSidebar}
+          companyId={companyId}
+          companyName={company?.name}
+          companies={companies}
+          onCompanySwitch={handleCompanySwitch}
+        />
+        <div className="app-shell__body">
+          {sidebarOpen && <div className="app-shell__backdrop" onClick={closeSidebar} />}
+          {hasCompany && (
+            <aside
+              className={`app-shell__sidebar${sidebarOpen ? ' app-shell__sidebar--open' : ''}`}
+              ref={sidebarRef}
+            >
+              <div className="app-shell__sidebar-header">
+                <div className="app-shell__sidebar-brand">
+                  <span className="app-shell__sidebar-brand-icon material-symbols-outlined">shield</span>
+                  <div>
+                    <div className="app-shell__sidebar-title">V-Vault</div>
+                    <div className="app-shell__sidebar-subtitle">Institutional Modernism</div>
+                  </div>
+                </div>
+              </div>
+
+              <nav className="app-shell__sidebar-nav">
+                <NavItems companyId={companyId} />
+              </nav>
+            </aside>
+          )}
+          <main className="app-shell__content">{children}</main>
+        </div>
+      </div>
+    </DollarRateProvider>
+  );
+}
+
+function NavItems({ companyId }: { companyId: string }) {
+  const { dollarRate } = useDollarRateContext();
+  const pathname = usePathname();
+
   const prefixedHref = (href: string) => `/${companyId}${href}`;
 
   const isActive = (href: string) => {
@@ -70,51 +120,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return pathname.startsWith(full);
   };
 
-  const handleCompanySwitch = (id: string) => {
-    router.push(`/${id}/dashboard`);
-  };
-
-  return (
-    <div className="app-shell">
-      <Header
-        onToggleSidebar={toggleSidebar}
-        companyId={companyId}
-        companyName={company?.name}
-        companies={companies}
-        onCompanySwitch={handleCompanySwitch}
-      />
-      <div className="app-shell__body">
-        {sidebarOpen && <div className="app-shell__backdrop" onClick={closeSidebar} />}
-        <aside
-          className={`app-shell__sidebar${sidebarOpen ? ' app-shell__sidebar--open' : ''}`}
-          ref={sidebarRef}
-        >
-          <div className="app-shell__sidebar-header">
-            <div className="app-shell__sidebar-brand">
-              <span className="app-shell__sidebar-brand-icon material-symbols-outlined">shield</span>
-              <div>
-                <div className="app-shell__sidebar-title">V-Vault</div>
-                <div className="app-shell__sidebar-subtitle">Institutional Modernism</div>
-              </div>
-            </div>
-          </div>
-
-          <nav className="app-shell__sidebar-nav">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={prefixedHref(item.href)}
-                className={`app-shell__nav-link${isActive(item.href) ? ' app-shell__nav-link--active' : ''}`}
-              >
-                <span className="app-shell__nav-icon material-symbols-outlined">{item.icon}</span>
-                <span className="app-shell__nav-label">{item.label}</span>
-              </Link>
-            ))}
-
-          </nav>
-        </aside>
-        <main className="app-shell__content">{children}</main>
-      </div>
-    </div>
-  );
+  return NAV_ITEMS.map((item) => (
+    <Link
+      key={item.href}
+      href={prefixedHref(item.href)}
+      className={`app-shell__nav-link${isActive(item.href) ? ' app-shell__nav-link--active' : ''}`}
+    >
+      <span className="app-shell__nav-icon material-symbols-outlined">{item.icon}</span>
+      <span className="app-shell__nav-label">{item.label}</span>
+      {item.href === '/dollar-rate' && dollarRate && (
+        <span className="app-shell__nav-rate">
+          {dollarRate.promedio.toFixed(2)}
+        </span>
+      )}
+    </Link>
+  ));
 }

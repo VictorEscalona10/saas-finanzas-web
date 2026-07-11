@@ -1,3 +1,5 @@
+import type { FlowDirection } from './Category';
+
 export type TransactionStatus = 'PENDING' | 'COMPLETED';
 export type Currency = 'BOLIVARES' | 'DOLARES';
 
@@ -21,6 +23,13 @@ export interface Transaction {
   unitPrice: number | null;
   dollarRate: number;
   amountUSD: number;
+  category: {
+    name: string;
+    flowDirection?: FlowDirection;
+  };
+  item?:{
+    name: string;
+  };
   amountBs: number;
   status: TransactionStatus;
   paymentMethod: PaymentMethod;

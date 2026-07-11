@@ -44,5 +44,35 @@ export function useCategorySearch() {
     }
   }, [session, isAuthenticated]);
 
-  return { searchCategory, ...state };
+  const listCategories = useCallback(async (companyId: string): Promise<FuzzySearchResult<Category> | null> => {
+    if (!session || !isAuthenticated) {
+      setState({ result: null, loading: false, error: 'No autenticado' });
+      return null;
+    }
+
+    const token = (session as { access_token: string }).access_token;
+    const repo = new CategoryRepositoryImpl(token);
+
+    setState({ result: null, loading: true, error: null });
+
+    try {
+      const paginated = await repo.list(companyId, 1, 200);
+      const result: FuzzySearchResult<Category> = {
+        success: true,
+        dataSource: 'prisma',
+        searchTerm: '',
+        count: paginated.data.length,
+        items: paginated.data,
+      };
+      setState({ result, loading: false, error: null });
+      return result;
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al listar categorías';
+      setState({ result: null, loading: false, error: message });
+      return null;
+    }
+  }, [session, isAuthenticated]);
+
+  return { searchCategory, listCategories, ...state };
 }

@@ -1,0 +1,317 @@
+.transaction-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.transaction-list__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 2.25rem;
+  color: #d6e3ff;
+  margin: 0;
+}
+
+.transaction-list__subtitle {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgba(185, 203, 185, 0.7);
+  margin: 0.25rem 0 0;
+}
+
+.transaction-list__error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  color: #f87171;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.transaction-list__retry {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.375rem;
+  color: #f87171;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  transition: all 0.2s ease;
+}
+
+.transaction-list__retry:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.transaction-list__table-container {
+  background: rgba(17, 32, 54, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.transaction-list__table-scroll {
+  overflow-x: auto;
+}
+
+.transaction-list__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-list__th {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(185, 203, 185, 0.7);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transaction-list__th--right {
+  text-align: right;
+}
+
+.transaction-list__th--center {
+  text-align: center;
+}
+
+.transaction-list__row {
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.transaction-list__row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.transaction-list__loading-row {
+  opacity: 0.5;
+}
+
+.transaction-list__td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #d6e3ff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+}
+
+.transaction-list__td--right {
+  text-align: right;
+}
+
+.transaction-list__td--date {
+  font-size: 0.8125rem;
+  color: rgba(185, 203, 185, 0.8);
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-list__td--amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-list__td--actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+.transaction-list__empty-value {
+  color: rgba(185, 203, 185, 0.4);
+}
+
+.transaction-list__category-name {
+  font-weight: 500;
+}
+
+.transaction-list__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.transaction-list__badge--completed {
+  background: rgba(0, 255, 136, 0.15);
+  color: #64ffda;
+}
+
+.transaction-list__badge--pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+.transaction-list__badge--flow {
+  min-width: 6rem;
+  justify-content: center;
+}
+
+.transaction-list__badge--inflow {
+  background: rgba(0, 255, 136, 0.15);
+  color: #64ffda;
+}
+
+.transaction-list__badge--outflow {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.transaction-list__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-list__action:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.transaction-list__action:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.transaction-list__action--view:hover:not(:disabled) {
+  color: #93ccff;
+}
+
+.transaction-list__action--edit:hover:not(:disabled) {
+  color: #64ffda;
+}
+
+.transaction-list__action--delete:hover:not(:disabled) {
+  color: #f87171;
+}
+
+.transaction-list__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.transaction-list__pagination-info {
+  font-size: 0.8125rem;
+  color: rgba(185, 203, 185, 0.6);
+}
+
+.transaction-list__pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.transaction-list__page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.375rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.7);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.transaction-list__page-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d6e3ff;
+}
+
+.transaction-list__page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.transaction-list__page-btn--active {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.3);
+  color: #64ffda;
+  font-weight: 600;
+}
+
+.transaction-list__page-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  color: rgba(185, 203, 185, 0.4);
+  font-size: 0.8125rem;
+}
+
+.transaction-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.transaction-list__empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  margin-bottom: 1.5rem;
+  color: rgba(185, 203, 185, 0.3);
+}
+
+.transaction-list__empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #d6e3ff;
+  margin: 0 0 0.5rem;
+}
+
+.transaction-list__empty-text {
+  font-size: 0.875rem;
+  color: rgba(185, 203, 185, 0.6);
+  margin: 0 0 1.5rem;
+  max-width: 24rem;
+}
+
+@media (max-width: 768px) {
+  .transaction-list__header {
+    flex-direction: column;
+  }
+
+  .transaction-list__pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

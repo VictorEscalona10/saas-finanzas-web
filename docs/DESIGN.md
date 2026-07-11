@@ -235,6 +235,11 @@ export function useCategoryList(companyId: string, page?: number) {
 
 **Component Folder Rule** — cada componente en su propio directorio:
 
+> **Inline CRUD:** Para los módulos **Item**, **Category** y **Transaction**, la creación, edición y detalle se hace **inline** en la misma página (`page.tsx`) mediante un drawer/modal, NO en rutas separadas `new/`, `[id]/edit/` ni `[id]/`. Esto aplica a:
+- `ItemForm` + `ItemDrawer` (items)
+- `CategoryDrawer` (categorías)
+- `TransactionForm` + `TransactionDrawer` + `TransactionDetailDrawer` (transacciones)
+
 ```
 components/transaction/
 ├── TransactionList/
@@ -257,7 +262,54 @@ Reglas:
 - ✅ Usar BEM en los nombres de clase CSS
 - ✅ Cada componente exporta por defecto desde `index.ts`
 
-### 1.6 Middleware (`src/middleware.ts`)
+### 1.6 Input Conventions — Reverse Currency Mask
+
+> **Todos los inputs donde se ingrese un monto en bolívares (Bs) o dólares (USD/USD$) DEBEN usar el patrón Reverse Currency Mask.**
+
+Este patrón permite al usuario escribir solo dígitos (se ignoran caracteres no numéricos) y automáticamente se formatea el valor con 2 decimales, donde los últimos 2 dígitos ingresados representan los céntimos.
+
+**Implementación:**
+
+```typescript
+// Estado interno: string de dígitos que representa centésimas
+const [rawValue, setRawValue] = useState('');
+
+// Handler: filtra solo dígitos
+const handleChange = (value: string) => {
+  setRawValue(value.replace(/\D/g, ''));
+};
+
+// Display: divide entre 100 y formatea con 2 decimales
+const displayValue = rawValue
+  ? new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(parseInt(rawValue, 10) / 100)
+  : '';
+
+// Valor real (numérico) para enviar al backend
+const numericValue = rawValue ? parseInt(rawValue, 10) / 100 : 0;
+```
+
+**Reglas:**
+
+- ✅ El `<input>` debe tener `type="text"` e `inputMode="numeric"`
+- ✅ El display formateado se renderiza como `value` del input; el raw state y la conversión numérica se derivan por separado
+- ✅ Debe mostrarse un prefijo visual (`Bs` o `$`) pegado al input cuando el contexto lo requiera
+- ❌ No usar `type="number"` para montos con este patrón (el teclado móvil lo soporta via `inputMode`)
+- ❌ No usar `step`, `min`, `max` en inputs de monto
+
+**Referencia de implementación existente:**
+- `src/components/item/ItemForm/ItemForm.tsx` — `rawPrice` / `displayPrice` / `handlePriceChange`
+- `src/components/dollar/DollarRateScreen/DollarRateScreen.tsx` — `rawRate` / `displayRate` / `handleRateChange`
+
+**Ejemplo de UI:**
+
+```
+┌──────────────────────┐
+│ $            1.250,00 │
+│ Bs           2.500,00 │
+└──────────────────────┘
+```
+
+### 1.7 Middleware (`src/middleware.ts`)
 
 El middleware de Next.js se encarga del refresh automático de la sesión de Supabase en cada request:
 

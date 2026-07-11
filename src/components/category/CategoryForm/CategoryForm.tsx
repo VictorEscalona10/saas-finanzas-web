@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, type FormEvent } from 'react';
+import { useState, useCallback, useEffect, type FormEvent } from 'react';
 import { useCreateCategory } from '@/src/use-cases/category/useCreateCategory';
 import { useUpdateCategory } from '@/src/use-cases/category/useUpdateCategory';
 import type { Category } from '@/src/domain/entities/Category';
@@ -15,9 +15,10 @@ interface CategoryFormProps {
   onCancel: () => void;
   id?: string;
   hideFooter?: boolean;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
-export default function CategoryForm({ companyId, category, onSave, onCancel, id, hideFooter }: CategoryFormProps) {
+export default function CategoryForm({ companyId, category, onSave, onCancel, id, hideFooter, onLoadingChange }: CategoryFormProps) {
   const isEdit = !!category;
   const { createCategory, loading: creating } = useCreateCategory();
   const { updateCategory, loading: updating } = useUpdateCategory();
@@ -30,6 +31,10 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
   const [error, setError] = useState<string | null>(null);
 
   const loading = creating || updating;
+
+  useEffect(() => {
+    onLoadingChange?.(loading);
+  }, [loading, onLoadingChange]);
 
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
@@ -181,7 +186,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
 
           {!hideFooter && (
             <div className="category-form__footer">
-              <Button variant="outline" size="lg" fullWidth onClick={onCancel} type="button">
+              <Button variant="outline" size="lg" fullWidth onClick={onCancel} type="button" disabled={loading}>
                 Cancelar
               </Button>
               <Button variant="primary" size="lg" fullWidth loading={loading} type="submit">

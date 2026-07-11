@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useLogin } from '@/src/use-cases/auth/useLogin';
+import { createClient } from '@/src/infrastructure/supabase/browser';
 import Button from '@/src/components/shared/Button';
 import Input from '@/src/components/shared/Input';
 import './LoginForm.css';
@@ -11,6 +12,19 @@ export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error, fieldErrors } = useLogin();
+
+  const handleGoogleLogin = async () => {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback`,
+        queryParams: {
+          prompt: 'select_account',
+        },
+      },
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +102,7 @@ export default function LoginForm() {
           <span className="login-page__divider-line" />
         </div>
 
-        <button type="button" className="login-page__google-btn">
+        <button type="button" className="login-page__google-btn" onClick={handleGoogleLogin}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M21.8055 10.0415H21V10H12V14H17.6515C16.827 16.3285 14.6115 18 12 18C8.6865 18 6 15.3135 6 12C6 8.6865 8.6865 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C6.4775 2 2 6.4775 2 12C2 17.5225 6.4775 22 12 22C17.5225 22 22 17.5225 22 12C22 11.3295 21.931 10.675 21.8055 10.0415Z" fill="#FFC107" />
             <path d="M3.15302 7.3455L6.43852 9.755C7.32752 7.554 9.48052 6 12 6C13.5295 6 14.921 6.577 15.9805 7.5195L18.809 4.691C17.023 3.0265 14.634 2 12 2C8.65902 2 5.78802 4.0355 3.15302 7.3455Z" fill="#FF3D00" />

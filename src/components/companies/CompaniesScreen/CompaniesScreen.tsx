@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMyCompanies } from '@/src/use-cases/company/useMyCompanies';
 import { useCreateCompany } from '@/src/use-cases/company/useCreateCompany';
 import { useUpdateCompany } from '@/src/use-cases/company/useUpdateCompany';
@@ -9,6 +9,9 @@ import Modal from '@/src/components/shared/Modal/Modal';
 import './CompaniesScreen.css';
 
 export default function CompaniesScreen() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedId = searchParams.get('selected');
   const { companies, isLoading, refetch } = useMyCompanies();
   const { createCompany, loading: creating } = useCreateCompany();
   const { updateCompany, loading: updating } = useUpdateCompany();
@@ -21,8 +24,6 @@ export default function CompaniesScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleteTargetName, setDeleteTargetName] = useState('');
-
-  const activeCompanyId = companies.find((c) => !c.isSuspended && !c.isRemoved)?.id;
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,13 +70,17 @@ export default function CompaniesScreen() {
     }
   };
 
+  const isActive = (company: typeof companies[number]) =>
+    company.id === selectedId && !company.isSuspended && !company.isRemoved;
+
+  const selectedCompany = selectedId
+    ? companies.find((c) => c.id === selectedId && !c.isSuspended && !c.isRemoved)
+    : null;
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
   };
-
-  const isActive = (company: typeof companies[number]) =>
-    company.id === activeCompanyId && !company.isSuspended && !company.isRemoved;
 
   return (
     <div className="companies-screen">
@@ -87,6 +92,15 @@ export default function CompaniesScreen() {
           </p>
         </div>
         <div className="companies-screen__header-actions">
+          {selectedCompany && (
+            <button
+              className="companies-screen__back-btn"
+              onClick={() => router.push(`/${selectedCompany.id}/dashboard`)}
+            >
+              <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+              Ir al dashboard de {selectedCompany.name}
+            </button>
+          )}
           <button
             className="companies-screen__create-btn"
             onClick={() => setShowCreateModal(true)}
@@ -132,6 +146,7 @@ export default function CompaniesScreen() {
               <article
                 key={company.id}
                 className={`companies-screen__card${active ? ' companies-screen__card--active' : ''}${company.isRemoved ? ' companies-screen__card--removed' : ''}`}
+                onClick={() => router.push(`/${company.id}/dashboard`)}
               >
                 {active && (
                   <div className="companies-screen__card-check" aria-label="Compañía activa">
@@ -139,10 +154,10 @@ export default function CompaniesScreen() {
                   </div>
                 )}
 
-                <Link href={`/${company.id}/dashboard`} className="companies-screen__card-body">
+                <div className="companies-screen__card-body">
                   <h3 className="companies-screen__card-name">{company.name}</h3>
                   <p className="companies-screen__card-date">Creada: {formatDate(company.createdAt)}</p>
-                </Link>
+                </div>
 
                 <div className="companies-screen__card-footer">
                   {company.isRemoved ? (
@@ -160,14 +175,14 @@ export default function CompaniesScreen() {
                     <div className="companies-screen__card-actions">
                       <button
                         className="companies-screen__card-action"
-                        onClick={() => handleEdit(company)}
+                        onClick={(e) => { e.stopPropagation(); handleEdit(company); }}
                         title="Editar"
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">edit</span>
                       </button>
                       <button
                         className="companies-screen__card-action companies-screen__card-action--danger"
-                        onClick={() => handleDeleteClick(company)}
+                        onClick={(e) => { e.stopPropagation(); handleDeleteClick(company); }}
                         disabled={deleting}
                         title="Eliminar"
                       >

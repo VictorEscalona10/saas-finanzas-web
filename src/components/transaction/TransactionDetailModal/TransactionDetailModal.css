@@ -1,0 +1,141 @@
+.transaction-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.transaction-detail__header-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.transaction-detail__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.transaction-detail__badge--completed {
+  background: rgba(0, 255, 136, 0.15);
+  color: #64ffda;
+}
+
+.transaction-detail__badge--pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+.transaction-detail__currency-tag {
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(185, 203, 185, 0.7);
+}
+
+.transaction-detail__amounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.transaction-detail__amount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transaction-detail__amount--usd {
+  background: rgba(0, 255, 136, 0.05);
+  border-color: rgba(0, 255, 136, 0.15);
+}
+
+.transaction-detail__amount--bs {
+  background: rgba(251, 191, 36, 0.05);
+  border-color: rgba(251, 191, 36, 0.15);
+}
+
+.transaction-detail__amount-label {
+  font-size: 0.75rem;
+  color: rgba(185, 203, 185, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.transaction-detail__amount-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-detail__amount--usd .transaction-detail__amount-value {
+  color: #64ffda;
+}
+
+.transaction-detail__amount--bs .transaction-detail__amount-value {
+  color: #fbbf24;
+}
+
+.transaction-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transaction-detail__info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.transaction-detail__info-row--column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.transaction-detail__info-label {
+  font-size: 0.8125rem;
+  color: rgba(185, 203, 185, 0.6);
+  white-space: nowrap;
+}
+
+.transaction-detail__info-value {
+  font-size: 0.875rem;
+  color: #d6e3ff;
+  text-align: right;
+  word-break: break-word;
+}
+
+.transaction-detail__info-value--mono {
+  font-family: monospace;
+  font-size: 0.8125rem;
+}
+
+.transaction-detail__modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.transaction-detail__modal-footer-left {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.transaction-detail__modal-footer-right {
+  display: flex;
+  gap: 0.75rem;
+}

@@ -1,0 +1,201 @@
+.dollar-screen {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem 1rem;
+}
+
+.dollar-screen__card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.dollar-screen__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.dollar-screen__header-icon {
+  font-size: 1.75rem;
+  color: #00ff88;
+  font-variation-settings: 'FILL' 1;
+}
+
+.dollar-screen__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  margin: 0;
+}
+
+.dollar-screen__current {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.dollar-screen__current-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(185, 203, 185, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.dollar-screen__current-value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #f0f0f0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.dollar-screen__current-currency {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(185, 203, 185, 0.5);
+}
+
+.dollar-screen__current-error {
+  font-size: 0.875rem;
+  color: #ef4444;
+}
+
+.dollar-screen__skeleton {
+  display: inline-block;
+  width: 160px;
+  height: 2.5rem;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.04) 75%);
+  background-size: 200% 100%;
+  animation: dollar-shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@keyframes dollar-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.dollar-screen__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.dollar-screen__source--official {
+  background: rgba(0, 255, 136, 0.08);
+  color: #00ff88;
+}
+
+.dollar-screen__source--manual {
+  background: rgba(255, 183, 0, 0.1);
+  color: #ffb700;
+}
+
+.dollar-screen__source-icon {
+  font-size: 0.875rem;
+  font-variation-settings: 'FILL' 1;
+}
+
+.dollar-screen__divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 1rem 0;
+}
+
+.dollar-screen__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dollar-screen__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(185, 203, 185, 0.8);
+}
+
+.dollar-screen__input-group {
+  position: relative;
+}
+
+.dollar-screen__input-prefix {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(185, 203, 185, 0.5);
+  font-size: 1rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.dollar-screen__input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+}
+
+.dollar-screen__input::placeholder {
+  color: rgba(185, 203, 185, 0.3);
+}
+
+.dollar-screen__input:focus {
+  border-color: #00ff88;
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1);
+}
+
+.dollar-screen__hint {
+  font-size: 0.75rem;
+  color: rgba(185, 203, 185, 0.4);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.dollar-screen__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dollar-screen__success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.15);
+  font-size: 0.8125rem;
+  color: #00ff88;
+  font-weight: 600;
+}
+
+.dollar-screen__success-icon {
+  font-size: 1.125rem;
+  font-variation-settings: 'FILL' 1;
+}
