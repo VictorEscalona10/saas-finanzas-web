@@ -2,6 +2,7 @@
 
 import type { Transaction } from '@/src/domain/entities/Transaction';
 import { PAYMENT_METHODS } from '@/src/shared/constants';
+import { parseISODate } from '@/src/shared/utils/dateUtils';
 import Modal from '@/src/components/shared/Modal';
 import Button from '@/src/components/shared/Button';
 import './TransactionDetailModal.css';
@@ -16,7 +17,10 @@ interface TransactionDetailModalProps {
 }
 
 function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
+  const datePart = dateStr.split('T')[0];
+  const [year, month, day] = datePart.split('-').map(Number);
+  if (!year || !month || !day) return dateStr;
+  const d = new Date(year, month - 1, day);
   return d.toLocaleDateString('es-VE', {
     day: '2-digit',
     month: 'long',
@@ -25,13 +29,20 @@ function formatDate(dateStr: string): string {
 }
 
 function formatTime(dateStr: string): string {
-  const d = new Date(dateStr);
+  const d = parseISODate(dateStr);
+  if (!d) return '';
   return d.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
 }
 
 function getPaymentMethodLabel(method: string): string {
   return (PAYMENT_METHODS as Record<string, string>)[method] ?? method;
 }
+
+const STOCK_EFFECT_LABELS: Record<string, string> = {
+  NONE: 'Sin efecto',
+  INCREMENT: 'Aumenta stock',
+  DECREMENT: 'Disminuye stock',
+};
 
 export default function TransactionDetailModal({ open, transaction, onClose, onEdit, onDelete, deleting }: TransactionDetailModalProps) {
   if (!transaction) return null;
@@ -78,6 +89,12 @@ export default function TransactionDetailModal({ open, transaction, onClose, onE
             <span className="transaction-detail__info-label">Método de pago</span>
             <span className="transaction-detail__info-value">{getPaymentMethodLabel(transaction.paymentMethod)}</span>
           </div>
+          {transaction.stockEffect && (
+            <div className="transaction-detail__info-row">
+              <span className="transaction-detail__info-label">Efecto inventario</span>
+              <span className="transaction-detail__info-value">{STOCK_EFFECT_LABELS[transaction.stockEffect] ?? transaction.stockEffect}</span>
+            </div>
+          )}
           <div className="transaction-detail__info-row">
             <span className="transaction-detail__info-label">Categoría</span>
             <span className="transaction-detail__info-value">{transaction.category.name}</span>
@@ -86,6 +103,12 @@ export default function TransactionDetailModal({ open, transaction, onClose, onE
             <div className="transaction-detail__info-row">
               <span className="transaction-detail__info-label">Item</span>
               <span className="transaction-detail__info-value">{transaction.item?.name}</span>
+            </div>
+          )}
+          {transaction.costItemId && (
+            <div className="transaction-detail__info-row">
+              <span className="transaction-detail__info-label">Costo Directo</span>
+              <span className="transaction-detail__info-value">{transaction.costItem?.name}</span>
             </div>
           )}
           {transaction.paymentReference && (

@@ -36,7 +36,7 @@ export default function ItemForm({ companyId, item, onSave, onCancel, id, hideFo
   const { createItems, loading: creating } = useCreateItem();
   const { updateItem, loading: updating } = useUpdateItem();
 
-  const [name, setName] = useState(item?.name ?? '');
+const [name, setName] = useState(item?.name ?? '');
   const [type, setType] = useState<ItemType>(item?.type ?? 'PRODUCT');
   const [rawPrice, setRawPrice] = useState(() => {
     if (item?.basePrice && item.basePrice > 0) {
@@ -85,22 +85,18 @@ export default function ItemForm({ companyId, item, onSave, onCancel, id, hideFo
     }
 
     let success = false;
+    const payload = {
+      name: name.trim(),
+      type,
+      basePrice,
+      ...(type === 'PRODUCT' ? { stockCurrent } : {}),
+    };
 
     if (isEdit && item) {
-      const result = await updateItem(item.id, companyId, {
-        name: name.trim(),
-        type,
-        basePrice,
-        ...(type === 'PRODUCT' ? { stockCurrent } : {}),
-      });
+      const result = await updateItem(item.id, companyId, payload);
       success = result !== null;
     } else {
-      const result = await createItems(companyId, [{
-        name: name.trim(),
-        type,
-        basePrice,
-        ...(type === 'PRODUCT' ? { stockCurrent } : {}),
-      }]);
+      const result = await createItems(companyId, [payload]);
       success = result !== null;
     }
 
@@ -164,7 +160,7 @@ export default function ItemForm({ companyId, item, onSave, onCancel, id, hideFo
               </div>
             </div>
 
-            {type === 'PRODUCT' && (
+{type === 'PRODUCT' && (
               <div className="item-form__field">
                 <label className="item-form__label" htmlFor="item-stock">Stock Inicial</label>
                 <input
@@ -178,6 +174,7 @@ export default function ItemForm({ companyId, item, onSave, onCancel, id, hideFo
                 />
               </div>
             )}
+
           </div>
 
           {!hideFooter && (

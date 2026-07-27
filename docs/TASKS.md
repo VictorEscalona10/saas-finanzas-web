@@ -170,19 +170,21 @@
 >
 > **Nota:** `ProductionBatch` entity e `IProductionBatchRepository` ya creados en Fase 0.
 
-- [ ] **7.1** Crear `src/infrastructure/repositories/ProductionBatchRepositoryImpl.ts`
-- [ ] **7.2** Crear `src/use-cases/batch/useBatchList.ts` — paginado
-- [ ] **7.3** Crear `src/use-cases/batch/useBatchByProduct.ts`
-- [ ] **7.4** Crear `src/use-cases/batch/useBatchById.ts`
-- [ ] **7.5** Crear `src/use-cases/batch/useCreateBatch.ts` — con transacciones anidadas
-- [ ] **7.6** Crear `src/use-cases/batch/useUpdateBatch.ts`
-- [ ] **7.7** Crear `src/use-cases/batch/useDeleteBatch.ts`
-- [ ] **7.8** Crear `src/components/batch/BatchList/` — tabla paginada con item info
-- [ ] **7.9** Crear `src/components/batch/BatchForm/` — formulario con selector de producto, fechas, transacciones embebidas
-- [ ] **7.10** Crear `src/components/batch/BatchDetail/` — detalle con transacciones del lote
-- [ ] **7.11** Crear `app/(private)/companies/[companyId]/batches/page.tsx`
-- [ ] **7.12** Crear `app/(private)/companies/[companyId]/batches/new/page.tsx`
-- [ ] **7.13** Crear `app/(private)/companies/[companyId]/batches/[batchId]/page.tsx`
+> **Nota:** El backend se actualizó — los lotes ya NO incluyen transacciones anidadas al crearse. Las transacciones se vinculan a un lote mediante `batchId` en `POST /transaction/create/:companyId`. La entidad `ProductionBatch` es independiente (quantity, status, batchDate). Las páginas usan el patrón `(app)/[companyId]/batches/`.
+
+- [x] **7.1** Crear `src/infrastructure/repositories/ProductionBatchRepositoryImpl.ts`
+- [x] **7.2** Crear `src/use-cases/batch/useBatchList.ts` — paginado
+- [x] **7.3** Crear `src/use-cases/batch/useBatchByProduct.ts`
+- [x] **7.4** Crear `src/use-cases/batch/useBatchById.ts`
+- [x] **7.5** Crear `src/use-cases/batch/useCreateBatch.ts`
+- [x] **7.6** Crear `src/use-cases/batch/useUpdateBatch.ts`
+- [x] **7.7** Crear `src/use-cases/batch/useDeleteBatch.ts`
+- [x] **7.8** Crear `src/components/batch/BatchList/` — tabla paginada con item info, navegación al detalle
+- [x] **7.9** Crear `src/components/batch/BatchForm/` — formulario con selector de producto, fechas, estado, redirect a detalle tras crear
+- [x] **7.10** Crear `src/components/batch/BatchDetail/` — detalle con info del lote + tabla de transacciones vinculadas + botón "Crear Transacción"
+- [x] **7.11** Crear `app/(private)/(app)/[companyId]/batches/page.tsx` — listado + drawer para crear
+- [x] **7.12** ~~Crear `app/(private)/companies/[companyId]/batches/new/page.tsx`~~ → creación inline vía drawer en 7.11
+- [x] **7.13** Crear `app/(private)/(app)/[companyId]/batches/[batchId]/page.tsx` — detalle + drawer para crear transacción vinculada
 
 ---
 
@@ -192,13 +194,13 @@
 >
 > **Nota:** `ICashFlowRepository` y tipos de respuesta ya creados en Fase 0.
 
-- [ ] **8.1** Crear `src/infrastructure/repositories/CashFlowRepositoryImpl.ts`
-- [ ] **8.2** Crear `src/use-cases/cash-flow/useCashFlowTotal.ts`
-- [ ] **8.3** Crear `src/use-cases/cash-flow/useCashFlowByRange.ts`
-- [ ] **8.4** Crear `src/components/cash-flow/CashFlowSummary/` — cards con current_balance, pending_inflow, pending_outflow, net_cash_flow
-- [ ] **8.5** Crear `src/components/cash-flow/CashFlowStatement/` — desglose por operating/investing/financing con categorías
-- [ ] **8.6** Crear `src/components/cash-flow/CashFlowChart/` — gráfico de barras o dona (usando el campo `color` de categorías)
-- [ ] **8.7** Crear `app/(private)/companies/[companyId]/cash-flow/page.tsx`
+- [x] **8.1** Crear `src/infrastructure/repositories/CashFlowRepositoryImpl.ts`
+- [x] **8.2** Crear `src/use-cases/cash-flow/useCashFlowTotal.ts`
+- [x] **8.3** Crear `src/use-cases/cash-flow/useCashFlowByRange.ts`
+- [x] **8.4** Crear `src/components/cash-flow/CashFlowSummary/` — cards con current_balance, pending_inflow, pending_outflow, net_cash_flow
+- [x] **8.5** Crear `src/components/cash-flow/CashFlowStatement/` — desglose por operating/investing/financing con categorías
+- [x] **8.6** Crear `src/components/cash-flow/CashFlowChart/` — gráfico de barras o dona (usando el campo `color` de categorías)
+- [x] **8.7** Crear `app/(private)/companies/[companyId]/cash-flow/page.tsx`
 
 ---
 
@@ -239,11 +241,11 @@
 >
 > **Nota:** `IFinanceChatRepository` y tipos de respuesta ya creados en Fase 0.
 
-- [ ] **11.1** Crear `src/infrastructure/repositories/FinanceChatRepositoryImpl.ts`
-- [ ] **11.2** Crear `src/use-cases/finance-chat/useFinanceChat.ts` — hook con historial de mensajes
-- [ ] **11.3** Crear `src/components/finance-chat/ChatWidget/` — widget flotante o página completa
-- [ ] **11.4** Crear `src/components/finance-chat/ChatMessage/` — burbuja de mensaje (usuario vs IA), renderizado markdown
-- [ ] **11.5** Crear `app/(private)/companies/[companyId]/finance-chat/page.tsx`
+- [x] **11.1** Crear `src/infrastructure/repositories/FinanceChatRepositoryImpl.ts`
+- [x] **11.2** Crear `src/use-cases/finance-chat/useFinanceChat.ts` — hook con historial de mensajes
+- [x] **11.3** Crear `src/components/finance-chat/ChatWidget/` — widget flotante o página completa
+- [x] **11.4** Crear `src/components/finance-chat/ChatMessage/` — burbuja de mensaje (usuario vs IA), renderizado markdown
+- [x] **11.5** Crear `app/(private)/companies/[companyId]/finance-chat/page.tsx`
 
 ---
 

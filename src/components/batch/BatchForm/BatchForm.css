@@ -1,0 +1,238 @@
+.batch-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.batch-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.batch-form__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.batch-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.batch-form__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #d6e3ff;
+}
+
+.batch-form__input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #dae6d8;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.batch-form__input::placeholder {
+  color: rgba(185, 203, 185, 0.4);
+}
+
+.batch-form__input:focus {
+  border-color: #00ff88;
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1);
+}
+
+.batch-form__status-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.batch-form__status-btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.batch-form__status-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.batch-form__status-btn--active {
+  border-color: transparent;
+}
+
+.batch-form__status-btn--open.batch-form__status-btn--active {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.batch-form__status-btn--closed.batch-form__status-btn--active {
+  background: rgba(185, 203, 185, 0.15);
+  color: #b9cbb9;
+  border-color: rgba(185, 203, 185, 0.3);
+}
+
+.batch-form__item-search {
+  position: relative;
+}
+
+.batch-form__item-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.batch-form__item-input-wrapper:focus-within {
+  border-color: #00ff88;
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1);
+}
+
+.batch-form__item-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #dae6d8;
+  outline: none;
+}
+
+.batch-form__item-input::placeholder {
+  color: rgba(185, 203, 185, 0.4);
+}
+
+.batch-form__item-clear {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.6);
+  cursor: pointer;
+  border-radius: 9999px;
+  margin-right: 0.25rem;
+}
+
+.batch-form__item-clear:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.batch-form__item-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(17, 32, 54, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.batch-form__item-dropdown-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.batch-form__item-skeleton {
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.batch-form__item-dropdown-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: rgba(185, 203, 185, 0.6);
+  font-size: 0.875rem;
+}
+
+.batch-form__item-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.batch-form__item-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.batch-form__item-option-name {
+  font-weight: 500;
+}
+
+.batch-form__item-option-type {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b9cbb9;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.batch-form__error {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 0.75rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+}
+
+.batch-form__footer {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .batch-form__footer {
+    flex-direction: row;
+  }
+}

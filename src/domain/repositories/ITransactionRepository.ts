@@ -1,10 +1,11 @@
-import { Transaction, Currency, TransactionStatus, PaymentMethod } from '@/src/domain/entities/Transaction';
+import { Transaction, Currency, TransactionStatus, PaymentMethod, StockEffect } from '@/src/domain/entities/Transaction';
 import { PaginatedResult } from '@/src/domain/entities/Pagination';
 
 export interface CreateTransactionDto {
   categoryId: string;
   itemId?: string;
   batchId?: string;
+  costItemId?: string;
   quantity?: number;
   unitPrice?: number;
   amountUSD: number;
@@ -16,12 +17,14 @@ export interface CreateTransactionDto {
   paymentReference?: string;
   description?: string;
   paymentDate?: string;
+  stockEffect?: StockEffect;
 }
 
 export interface UpdateTransactionDto {
   categoryId?: string;
   itemId?: string;
   batchId?: string;
+  costItemId?: string;
   quantity?: number;
   unitPrice?: number;
   amountUSD?: number;
@@ -33,6 +36,7 @@ export interface UpdateTransactionDto {
   paymentReference?: string;
   description?: string;
   paymentDate?: string;
+  stockEffect?: StockEffect;
 }
 
 export interface ITransactionRepository {

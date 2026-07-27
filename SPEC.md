@@ -19,10 +19,11 @@
    - [2.6 Transaction](#26-transaction)
    - [2.7 Production Batch](#27-production-batch)
    - [2.8 Cash Flow](#28-cash-flow)
-   - [2.9 Contribution Margin](#29-contribution-margin)
-   - [2.10 Balance Point](#210-balance-point)
-   - [2.11 Finance Chat](#211-finance-chat)
-   - [2.12 MCP (AI Tools)](#212-mcp-ai-tools)
+    - [2.8 Cost Item](#28-cost-item)
+    - [2.9 Contribution Margin](#29-contribution-margin)
+    - [2.10 Balance Point](#210-balance-point)
+    - [2.11 Finance Chat](#211-finance-chat)
+    - [2.12 MCP (AI Tools)](#212-mcp-ai-tools)
 3. [Modelos de Datos](#3-modelos-de-datos)
 4. [Reglas de Negocio](#4-reglas-de-negocio)
 5. [Manejo de Errores](#5-manejo-de-errores)
@@ -320,6 +321,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
   flowDirection: 'INFLOW' | 'OUTFLOW';
   isVariable?: boolean;      // default false
   isCogs: boolean;           // ¿Es costo de venta?
+  isDirectCost?: boolean;    // default false. Solo aplica si flowDirection=OUTFLOW e isCogs=true
 }
 ```
 
@@ -343,6 +345,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
       "flowDirection": "INFLOW",
       "isCogs": false,
       "isVariable": false,
+      "isDirectCost": false,
       "isDefault": false,
       "isRemoved": false,
       "createdAt": "2026-06-05T12:00:00.000Z"
@@ -391,6 +394,7 @@ Soft delete (marca `isRemoved: true`).
       "type": "OPERATING",
       "flowDirection": "INFLOW",
       "isCogs": false,
+      "isDirectCost": false,
       "isDefault": false
     }
   ]
@@ -523,11 +527,13 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 [
   {
     categoryId: string;              // UUID, obligatorio
-    itemId?: string;                 // UUID, opcional
-    batchId?: string;                // UUID, opcional
-    quantity?: number;               // opcional
-    unitPrice?: number;              // opcional
-    amount: number;                  // obligatorio
+    itemId?: string;                 // UUID, opcional — item/servicio asociado
+    batchId?: string;                // UUID, opcional — lote de producción
+    costItemId?: string;             // UUID, opcional — costo directo asociado (cuando category.isDirectCost=true)
+    quantity?: number;               // opcional — para items tipo PRODUCT
+    unitPrice?: number;              // opcional — precio unitario USD
+    amountUSD: number;               // obligatorio — monto en dólares
+    amountBs: number;                // obligatorio — monto en bolívares (backend calcula si se envía currency)
     dollarRate: number;              // obligatorio — tasa del día
     status: 'PENDING' | 'COMPLETED';
     paymentMethod: PaymentMethod;    // ver enum abajo
@@ -535,6 +541,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
     paymentReference?: string;       // min 4, solo dígitos
     description?: string;            // min 3, max 100
     paymentDate?: string;            // ISO date string
+    stockEffect?: 'INCREMENT' | 'DECREMENT' | 'NONE';  // opcional — efecto en inventario
   }
 ]
 ```
@@ -569,11 +576,13 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
       "categoryId": "uuid",
       "itemId": "uuid",
       "batchId": null,
+      "costItemId": null,
       "quantity": 10,
       "unitPrice": 4.50,
       "dollarRate": 80.50,
       "amountUSD": 45.00,
       "amountBs": 3622.50,
+      "stockEffect": "DECREMENT",
       "status": "COMPLETED",
       "paymentMethod": "EFECTIVO_DIVISAS",
       "currency": "DOLARES",
@@ -584,6 +593,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
       "createdAt": "2026-06-05T12:00:00.000Z",
       "category": { ... },
       "item": { ... },
+      "costItem": null,
       "batch": null
     }
   ],
@@ -638,30 +648,16 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 **Throttle:** 20 req/60s
 
-**Request body:**
+**Request body (all optional):**
 ```typescript
 {
-  quantity: number;
-  status: 'OPEN' | 'CLOSED';
-  batchDate: string; // ISO date
-  transactions: [
-    {
-      categoryId: string;         // UUID
-      amount: number;
-      dollarRate: number;
-      quantity: number;
-      paymentMethod: PaymentMethod;
-      currency: 'BOLIVARES' | 'DOLARES';
-      paymentReference?: string;
-      description?: string;
-      status: 'PENDING' | 'COMPLETED';
-      paymentDate?: string;
-    }
-  ]
+  quantity?: number;
+  status?: 'OPEN' | 'CLOSED';
+  batchDate?: string; // ISO date
 }
 ```
 
-**Response:** ProductionBatch creado con `transactions` incluidas.
+**Response:** ProductionBatch creado. Las transacciones se vinculan al lote por separado mediante `batchId` en `POST /transaction/create/:companyId`.
 
 ---
 
@@ -706,7 +702,58 @@ Soft delete (usando `PATCH`, no `DELETE`).
 
 ---
 
-### 2.8 Cash Flow
+### 2.8 Cost Item
+
+Base: `/cost-item`
+Auth: **Todos** requieren JWT + ValidateCompanyGuard
+
+#### `GET /cost-item/get-all/:companyId`
+
+**Query params:** `?page=1&limit=50`
+
+**Response (paginated):**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "companyId": "uuid",
+      "name": "iPhone 15",
+      "basePrice": 1200.00,
+      "isRemoved": false,
+      "createdAt": "2026-06-05T12:00:00.000Z"
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 1, "totalPages": 1 }
+}
+```
+
+---
+
+#### `GET /cost-item/search/:name/:companyId`
+
+**Route params:** `name` (string, min 1) y `companyId` (UUID)
+
+**Response (búsqueda fuzzy):**
+```json
+{
+  "success": true,
+  "dataSource": "fuzzy",
+  "searchTerm": "iphone",
+  "count": 1,
+  "items": [
+    {
+      "id": "uuid",
+      "name": "iPhone 15",
+      "basePrice": 1200.00
+    }
+  ]
+}
+```
+
+---
+
+### 2.9 Cash Flow
 
 Base: `/cash-flow`
 Auth: **Todos** requieren JWT + ValidateCompanyGuard
@@ -787,7 +834,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 ---
 
-### 2.9 Contribution Margin
+### 2.10 Contribution Margin
 
 Base: `/contribution-margin`
 Auth: **Todos** requieren JWT + ValidateCompanyGuard
@@ -854,7 +901,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 ---
 
-### 2.10 Balance Point
+### 2.11 Balance Point
 
 #### `GET /balance-point/:companyId/:startDate/:endDate`
 
@@ -894,7 +941,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 ---
 
-### 2.11 Finance Chat
+### 2.12 Finance Chat
 
 #### `POST /finance-chat/ask/:companyId`
 
@@ -922,7 +969,7 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 ---
 
-### 2.12 MCP (AI Tools)
+### 2.13 MCP (AI Tools)
 
 Solo disponibles si `MCP_HTTP_ENABLED=true`.
 
@@ -976,6 +1023,7 @@ Envía mensajes MCP JSON-RPC a través de la sesión SSE. Usado internamente por
 | `flowDirection` | `INFLOW` \| `OUTFLOW` | |
 | `isCogs` | boolean | ¿Es costo de venta? |
 | `isVariable` | boolean | ¿Es costo variable? |
+| `isDirectCost` | boolean | ¿Es costo directo? (compra para reventa). Solo aplica si `flowDirection=OUTFLOW` e `isCogs=true` |
 | `isDefault` | boolean | Categoría global del sistema |
 | `isRemoved` | boolean | |
 
@@ -1000,11 +1048,13 @@ Envía mensajes MCP JSON-RPC a través de la sesión SSE. Usado internamente por
 | `categoryId` | UUID | FK → Category |
 | `itemId` | UUID \| null | FK → Item (nullable: gastos generales) |
 | `batchId` | UUID \| null | FK → ProductionBatch |
+| `costItemId` | UUID \| null | FK → CostItem (nullable: costo directo asociado) |
 | `quantity` | number \| null | |
 | `unitPrice` | number (Decimal) \| null | |
 | `dollarRate` | number (Decimal) | Tasa del día |
 | `amountUSD` | number (Decimal) | |
 | `amountBs` | number (Decimal) | |
+| `stockEffect` | `INCREMENT` \| `DECREMENT` \| `NONE` \| null | Efecto en inventario |
 | `status` | `PENDING` \| `COMPLETED` | |
 | `paymentMethod` | PaymentMethod | Ver enum en sección 2.6 |
 | `currency` | `BOLIVARES` \| `DOLARES` | |
@@ -1023,6 +1073,17 @@ Envía mensajes MCP JSON-RPC a través de la sesión SSE. Usado internamente por
 | `quantity` | number | Cantidad producida |
 | `status` | `OPEN` \| `CLOSED` | |
 | `batchDate` | ISO datetime | |
+| `isRemoved` | boolean | |
+| `createdAt` | ISO datetime | |
+
+### CostItem
+
+| Campo | Tipo | Notas |
+|-------|------|-------|
+| `id` | UUID | PK |
+| `companyId` | UUID | FK → Company |
+| `name` | string | Nombre del costo directo (ej: "iPhone 15", "Lote A") |
+| `basePrice` | number (Decimal) \| null | Precio base referencial |
 | `isRemoved` | boolean | |
 | `createdAt` | ISO datetime | |
 
@@ -1174,6 +1235,7 @@ El backend acepta los orígenes definidos en `FRONTEND_URL` (variable de entorno
 | Item | CRUD + filtros por tipo + fuzzy search | ✅ |
 | Transaction | CRUD + filtros por fecha/categoría | ✅ |
 | Production Batch | CRUD + filtros por producto | ✅ |
+| Cost Item | Listado + búsqueda fuzzy | ✅ |
 | Cash Flow | Total y por rango de fechas | ✅ |
 | Contribution Margin | Global, por producto, por lote, por servicio | ✅ |
 | Balance Point | Punto de equilibrio | ✅ |

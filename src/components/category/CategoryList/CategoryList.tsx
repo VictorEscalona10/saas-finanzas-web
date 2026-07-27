@@ -170,6 +170,7 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
                   <th className="category-list__th">Dirección</th>
                   <th className="category-list__th">Costo (Cogs)</th>
                   <th className="category-list__th">Variable</th>
+                  <th className="category-list__th">Directo</th>
                   <th className="category-list__th">Origen</th>
                   <th className="category-list__th category-list__th--right">Acciones</th>
                 </tr>
@@ -197,6 +198,15 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
                       <span className={`material-symbols-outlined ${cat.isVariable ? 'category-list__icon--active' : 'category-list__icon--inactive'}`}>
                         {cat.isVariable ? 'check_circle' : 'cancel'}
                       </span>
+                    </td>
+                    <td className="category-list__td">
+                      {cat.flowDirection === 'OUTFLOW' && cat.isCogs ? (
+                        <span className={`material-symbols-outlined ${cat.isDirectCost ? 'category-list__icon--active' : 'category-list__icon--inactive'}`}>
+                          {cat.isDirectCost ? 'check_circle' : 'cancel'}
+                        </span>
+                      ) : (
+                        <span className="category-list__empty-value">&mdash;</span>
+                      )}
                     </td>
                     <td className="category-list__td">
                       <span className={`category-list__badge category-list__badge--${cat.companyId ? 'own' : 'global'}`}>

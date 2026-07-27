@@ -1,0 +1,99 @@
+.cash-flow-summary__kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cash-flow-summary__kpi-card {
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(17, 32, 54, 0.6),
+    rgba(4, 19, 41, 0.9));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(53, 71, 103, 0.4);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cash-flow-summary__kpi-card:hover {
+  border-color: rgba(56, 222, 187, 0.4);
+  transform: translateY(-2px);
+}
+
+.cash-flow-summary__kpi-card--positive {
+  border-color: rgba(56, 222, 187, 0.25);
+}
+
+.cash-flow-summary__kpi-card--negative {
+  border-color: rgba(255, 180, 171, 0.25);
+}
+
+.cash-flow-summary__kpi-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.cash-flow-summary__kpi-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cash-flow-summary__kpi-primary {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #d6e3ff;
+  line-height: 1.1;
+}
+
+.cash-flow-summary__kpi-primary--positive {
+  color: #38debb;
+}
+
+.cash-flow-summary__kpi-primary--negative {
+  color: #ffb4ab;
+}
+
+.cash-flow-summary__kpi-secondary {
+  font-size: 0.8125rem;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.cash-flow-summary__kpi-secondary--positive {
+  color: rgba(56, 222, 187, 0.7);
+}
+
+.cash-flow-summary__kpi-secondary--negative {
+  color: rgba(255, 180, 171, 0.7);
+}
+
+@media (max-width: 1200px) {
+  .cash-flow-summary__kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cash-flow-summary__kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .cash-flow-summary__kpi-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .cash-flow-summary__kpi-primary {
+    font-size: 1.125rem;
+  }
+}

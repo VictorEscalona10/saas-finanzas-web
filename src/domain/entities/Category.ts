@@ -9,6 +9,7 @@ export interface Category {
   flowDirection: FlowDirection;
   isCogs: boolean;
   isVariable: boolean;
+  isDirectCost: boolean;
   isDefault: boolean;
   isRemoved: boolean;
 }

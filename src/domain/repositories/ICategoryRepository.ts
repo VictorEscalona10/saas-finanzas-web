@@ -8,6 +8,7 @@ export interface CreateCategoryDto {
   flowDirection: FlowDirection;
   isVariable?: boolean;
   isCogs: boolean;
+  isDirectCost?: boolean;
 }
 
 export interface UpdateCategoryDto {
@@ -16,6 +17,7 @@ export interface UpdateCategoryDto {
   flowDirection: FlowDirection;
   isVariable?: boolean;
   isCogs: boolean;
+  isDirectCost?: boolean;
 }
 
 export interface ICategoryRepository {

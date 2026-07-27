@@ -28,6 +28,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
   const [flowDirection, setFlowDirection] = useState<FlowDirection>(category?.flowDirection ?? 'INFLOW');
   const [isCogs, setIsCogs] = useState(category?.isCogs ?? false);
   const [isVariable, setIsVariable] = useState(category?.isVariable ?? false);
+  const [isDirectCost, setIsDirectCost] = useState(category?.isDirectCost ?? false);
   const [error, setError] = useState<string | null>(null);
 
   const loading = creating || updating;
@@ -54,6 +55,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
         flowDirection,
         isCogs,
         isVariable,
+        isDirectCost: flowDirection === 'OUTFLOW' ? isDirectCost : undefined,
       });
       success = result !== null;
     } else {
@@ -63,6 +65,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
         flowDirection,
         isCogs,
         isVariable,
+        isDirectCost: flowDirection === 'OUTFLOW' ? isDirectCost : undefined,
       });
       success = result !== null;
     }
@@ -70,7 +73,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
     if (success) {
       onSave();
     }
-  }, [name, type, flowDirection, isCogs, isVariable, isEdit, category, companyId, createCategory, updateCategory, onSave]);
+  }, [name, type, flowDirection, isCogs, isVariable, isDirectCost, isEdit, category, companyId, createCategory, updateCategory, onSave]);
 
   return (
     <div className="category-form-wrapper">
@@ -133,7 +136,12 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
                 <button
                   type="button"
                   className={`category-form__segmented-btn${flowDirection === 'INFLOW' ? ' category-form__segmented-btn--active category-form__segmented-btn--inflow' : ''}`}
-                  onClick={() => setFlowDirection('INFLOW')}
+                  onClick={() => {
+                    setFlowDirection('INFLOW');
+                    setIsCogs(false);
+                    setIsVariable(false);
+                    setIsDirectCost(false);
+                  }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>trending_up</span>
                   <span>INFLOW</span>
@@ -150,39 +158,63 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
             </div>
           </div>
 
-          <div className="category-form__grid">
-            <div className="category-form__toggle-card">
-              <div className="category-form__toggle-info">
-                <span className="category-form__toggle-label">Costo de Venta (COGS)</span>
-                <span className="category-form__toggle-desc">¿Es un costo directo?</span>
-              </div>
-              <label className="category-form__switch">
-                <input
-                  className="category-form__switch-input"
-                  type="checkbox"
-                  checked={isCogs}
-                  onChange={(e) => setIsCogs(e.target.checked)}
-                />
-                <span className="category-form__switch-slider" />
-              </label>
-            </div>
+          {flowDirection === 'OUTFLOW' && (
+            <>
+              <div className="category-form__grid">
+                <div className="category-form__toggle-card">
+                  <div className="category-form__toggle-info">
+                    <span className="category-form__toggle-label">Costo de Venta (COGS)</span>
+                    <span className="category-form__toggle-desc">¿Es un costo directo?</span>
+                  </div>
+                  <label className="category-form__switch">
+                    <input
+                      className="category-form__switch-input"
+                      type="checkbox"
+                      checked={isCogs}
+                      onChange={(e) => setIsCogs(e.target.checked)}
+                    />
+                    <span className="category-form__switch-slider" />
+                  </label>
+                </div>
 
-            <div className="category-form__toggle-card">
+                <div className="category-form__toggle-card">
+                  <div className="category-form__toggle-info">
+                    <span className="category-form__toggle-label">Costo Variable</span>
+                    <span className="category-form__toggle-desc">¿Depende del volumen?</span>
+                  </div>
+                  <label className="category-form__switch">
+                    <input
+                      className="category-form__switch-input"
+                      type="checkbox"
+                      checked={isVariable}
+                      onChange={(e) => setIsVariable(e.target.checked)}
+                    />
+                    <span className="category-form__switch-slider" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="category-form__toggle-card">
               <div className="category-form__toggle-info">
-                <span className="category-form__toggle-label">Costo Variable</span>
-                <span className="category-form__toggle-desc">¿Depende del volumen?</span>
+                <span className="category-form__toggle-label">Costo Directo</span>
+                <span className="category-form__toggle-desc">
+                  {isDirectCost
+                    ? 'Compra directa del producto para reventa (ej: comprar iPhone para venderlo)'
+                    : 'Costo indirecto / materia prima para producir otro producto (ej: harina para hacer pan)'}
+                </span>
               </div>
               <label className="category-form__switch">
                 <input
                   className="category-form__switch-input"
                   type="checkbox"
-                  checked={isVariable}
-                  onChange={(e) => setIsVariable(e.target.checked)}
+                  checked={isDirectCost}
+                  onChange={(e) => setIsDirectCost(e.target.checked)}
                 />
                 <span className="category-form__switch-slider" />
               </label>
             </div>
-          </div>
+            </>
+          )}
 
           {!hideFooter && (
             <div className="category-form__footer">

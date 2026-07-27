@@ -1,0 +1,127 @@
+.cash-flow-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(17, 32, 54, 0.6),
+    rgba(4, 19, 41, 0.9));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(53, 71, 103, 0.4);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.cash-flow-filters__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cash-flow-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cash-flow-filters__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.cash-flow-filters__input {
+  padding: 0.5rem 0.75rem;
+  background: rgba(4, 19, 41, 0.6);
+  border: 1px solid rgba(53, 71, 103, 0.5);
+  border-radius: 8px;
+  color: #d6e3ff;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.cash-flow-filters__input:focus {
+  border-color: rgba(56, 222, 187, 0.5);
+}
+
+.cash-flow-filters__input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+.cash-flow-filters__select {
+  padding: 0.5rem 0.75rem;
+  padding-right: 2rem;
+  background: rgba(4, 19, 41, 0.6);
+  border: 1px solid rgba(53, 71, 103, 0.5);
+  border-radius: 8px;
+  color: #d6e3ff;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2386a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+}
+
+.cash-flow-filters__select:focus {
+  border-color: rgba(56, 222, 187, 0.5);
+}
+
+.cash-flow-filters__select option {
+  background: #0a1929;
+  color: #d6e3ff;
+}
+
+.cash-flow-filters__btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.cash-flow-filters__btn--apply {
+  background: rgba(56, 222, 187, 0.15);
+  border-color: rgba(56, 222, 187, 0.3);
+  color: #38debb;
+}
+
+.cash-flow-filters__btn--apply:hover {
+  background: rgba(56, 222, 187, 0.25);
+}
+
+.cash-flow-filters__btn--clear {
+  background: rgba(255, 180, 171, 0.1);
+  border-color: rgba(255, 180, 171, 0.2);
+  color: #ffb4ab;
+}
+
+.cash-flow-filters__btn--clear:hover {
+  background: rgba(255, 180, 171, 0.2);
+}
+
+@media (max-width: 640px) {
+  .cash-flow-filters {
+    padding: 1rem;
+  }
+
+  .cash-flow-filters__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+}

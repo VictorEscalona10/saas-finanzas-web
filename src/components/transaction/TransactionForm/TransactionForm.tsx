@@ -6,7 +6,7 @@ import { useUpdateTransaction } from '@/src/use-cases/transaction/useUpdateTrans
 import { useItemSearch } from '@/src/use-cases/item/useItemSearch';
 import { useDollarRateContext } from '@/src/shared/contexts/DollarRateContext';
 import CategorySelect from '@/src/components/category/CategorySelect';
-import type { Transaction, TransactionStatus, PaymentMethod } from '@/src/domain/entities/Transaction';
+import type { Transaction, TransactionStatus, PaymentMethod, StockEffect } from '@/src/domain/entities/Transaction';
 import type { Category } from '@/src/domain/entities/Category';
 import type { Item } from '@/src/domain/entities/Item';
 import { PAYMENT_METHODS } from '@/src/shared/constants';
@@ -30,9 +30,10 @@ interface TransactionFormProps {
   id?: string;
   hideFooter?: boolean;
   onLoadingChange?: (loading: boolean) => void;
+  defaultBatchId?: string;
 }
 
-export default function TransactionForm({ companyId, transaction, onSave, onCancel, id, hideFooter, onLoadingChange }: TransactionFormProps) {
+export default function TransactionForm({ companyId, transaction, onSave, onCancel, id, hideFooter, onLoadingChange, defaultBatchId }: TransactionFormProps) {
   const isEdit = !!transaction;
   const { createTransactions, loading: creating } = useCreateTransaction();
   const { updateTransaction, loading: updating } = useUpdateTransaction();
@@ -76,6 +77,8 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
   const [paymentReference, setPaymentReference] = useState(transaction?.paymentReference ?? '');
   const [paymentDate, setPaymentDate] = useState(transaction?.paymentDate ?? '');
   const [description, setDescription] = useState(transaction?.description ?? '');
+  const [stockEffect, setStockEffect] = useState<StockEffect>(transaction?.stockEffect ?? 'NONE');
+  const [showQuantity, setShowQuantity] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemContainerRef = useRef<HTMLDivElement>(null);
@@ -169,12 +172,27 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
     setRawAmountBs(String(Math.round(totalUSD * rateVal * 100)));
   }, []);
 
+  const recalcDirectCostAmounts = useCallback(() => {
+    const qty = parseInt(quantity, 10);
+    const upCents = parseInt(unitPriceRaw, 10);
+    const rateVal = parseInt(dollarRate, 10) / 100;
+    if (isNaN(qty) || qty <= 0 || isNaN(upCents) || upCents <= 0 || isNaN(rateVal) || rateVal <= 0) return;
+    const totalUSD = (upCents / 100) * qty;
+    setRawAmountUSD(String(Math.round(totalUSD * 100)));
+    setRawAmountBs(String(Math.round(totalUSD * rateVal * 100)));
+  }, [quantity, unitPriceRaw, dollarRate]);
+
   const handleDollarRateChange = useCallback((value: string) => {
     const digits = value.replace(/\D/g, '');
     setDollarRate(digits);
 
     const rate = parseInt(digits, 10) / 100;
     if (isNaN(rate) || rate <= 0) return;
+
+    if (showQuantity) {
+      recalcDirectCostAmounts();
+      return;
+    }
 
     // For products: recalc from unitPrice × qty (source of truth)
     if (selectedItem?.type === 'PRODUCT') {
@@ -189,7 +207,7 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
     if (usdVal > 0) {
       setRawAmountBs(String(Math.round(usdVal * rate * 100)));
     }
-  }, [selectedItem, quantity, unitPriceRaw, recalcProductAmounts, rawAmountUSD]);
+  }, [selectedItem, quantity, unitPriceRaw, recalcProductAmounts, rawAmountUSD, showQuantity, recalcDirectCostAmounts]);
 
   const handleQuantityChange = useCallback((value: string) => {
     const digits = value.replace(/\D/g, '');
@@ -200,7 +218,10 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
       const rateVal = parseInt(dollarRate, 10) / 100;
       recalcProductAmounts(qty, upCents, rateVal);
     }
-  }, [selectedItem, unitPriceRaw, dollarRate, recalcProductAmounts]);
+    if (showQuantity) {
+      recalcDirectCostAmounts();
+    }
+  }, [selectedItem, unitPriceRaw, dollarRate, recalcProductAmounts, showQuantity, recalcDirectCostAmounts]);
 
   const handleUnitPriceChange = useCallback((value: string) => {
     const digits = value.replace(/\D/g, '');
@@ -211,7 +232,10 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
       const rateVal = parseInt(dollarRate, 10) / 100;
       recalcProductAmounts(qty, upCents, rateVal);
     }
-  }, [selectedItem, quantity, dollarRate, recalcProductAmounts]);
+    if (showQuantity) {
+      recalcDirectCostAmounts();
+    }
+  }, [selectedItem, quantity, dollarRate, recalcProductAmounts, showQuantity, recalcDirectCostAmounts]);
 
   const resetItemFields = useCallback(() => {
     setQuantity('');
@@ -282,8 +306,6 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
     };
   }, []);
 
-
-
   const handleSubmit = useCallback(async (e: FormEvent) => {
     console.log(e.type)
     e.preventDefault();
@@ -308,13 +330,23 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
       return;
     }
 
+    if (!paymentDate) {
+      setError('La fecha de la operación es obligatoria');
+      return;
+    }
+
     let success = false;
 
+    const isDirectCost = category.isDirectCost === true;
+    const useProductCalc = !isDirectCost && selectedItem?.type === 'PRODUCT';
+    const useQuantityToggle = isDirectCost && showQuantity;
     const payload = {
       categoryId: category.id,
-      itemId: selectedItem?.id,
-      quantity: selectedItem?.type === 'PRODUCT' && quantity ? parseInt(quantity, 10) : undefined,
-      unitPrice: selectedItem?.type === 'PRODUCT' && unitPriceRaw ? parseInt(unitPriceRaw, 10) / 100 : undefined,
+      itemId: isDirectCost ? undefined : selectedItem?.id,
+      costItemId: isDirectCost ? selectedItem?.id : undefined,
+      batchId: defaultBatchId ?? transaction?.batchId ?? undefined,
+      quantity: (useProductCalc || useQuantityToggle) && quantity ? parseInt(quantity, 10) : undefined,
+      unitPrice: (useProductCalc || useQuantityToggle) && unitPriceRaw ? parseInt(unitPriceRaw, 10) / 100 : undefined,
       amountUSD,
       amountBs,
       dollarRate: rate,
@@ -323,7 +355,8 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
       paymentMethod,
       paymentReference: paymentReference || undefined,
       description: description || undefined,
-      paymentDate: paymentDate || undefined,
+      paymentDate,
+      stockEffect: (useProductCalc || useQuantityToggle) ? stockEffect : undefined,
     };
 
     if (isEdit && transaction) {
@@ -345,7 +378,7 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
     if (success) {
       onSave();
     }
-  }, [category, selectedItem, quantity, rawAmountUSD, rawAmountBs, unitPriceRaw, dollarRate, status, paymentMethod, paymentReference, description, paymentDate, isEdit, transaction, companyId, createTransactions, updateTransaction, onSave]);
+  }, [category, selectedItem, quantity, rawAmountUSD, rawAmountBs, unitPriceRaw, dollarRate, status, paymentMethod, paymentReference, description, paymentDate, stockEffect, showQuantity, isEdit, transaction, companyId, createTransactions, updateTransaction, onSave, defaultBatchId]);
 
   return (
     <div className="transaction-form-wrapper">
@@ -356,19 +389,29 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
             <CategorySelect
               companyId={companyId}
               value={category}
-              onChange={(cat) => setCategory(cat)}
+              onChange={(cat) => {
+                setCategory(cat);
+                setSelectedItem(null);
+                setItemQuery('');
+                setQuantity('');
+                setUnitPriceRaw('');
+                setStockEffect('NONE');
+                setShowQuantity(false);
+              }}
               placeholder="Seleccionar categoría..."
             />
           </div>
 
           <div className="transaction-form__field">
-            <label className="transaction-form__label">Item (Opcional)</label>
+            <label className="transaction-form__label">
+              {category?.isDirectCost ? 'Costo Directo (Opcional)' : 'Item (Opcional)'}
+            </label>
             <div className="transaction-form__item-search" ref={itemContainerRef}>
               <div className="transaction-form__item-input-wrapper">
                 <input
                   className="transaction-form__item-input"
                   type="text"
-                  placeholder="Buscar item..."
+                  placeholder={category?.isDirectCost ? 'Buscar costo directo...' : 'Buscar item...'}
                   value={itemQuery}
                   onChange={(e) => handleItemSearch(e.target.value)}
                   onFocus={openItemDropdown}
@@ -420,7 +463,7 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
             </div>
           </div>
 
-          {selectedItem?.type === 'PRODUCT' && (
+          {!category?.isDirectCost && selectedItem?.type === 'PRODUCT' && (
             <>
               <div className="transaction-form__stock-label">
                 Stock disponible: <strong className="transaction-form__stock-value">{selectedItem.stockCurrent}</strong>
@@ -455,37 +498,117 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
             </>
           )}
 
+          {category?.flowDirection === 'OUTFLOW' && category?.isDirectCost && selectedItem && (
+            <div className="transaction-form__toggle-card">
+              <div className="transaction-form__toggle-info">
+                <span className="transaction-form__toggle-label">Registrar cantidad</span>
+                <span className="transaction-form__toggle-desc">
+                  {showQuantity
+                    ? 'El monto se calculará automáticamente desde precio × cantidad'
+                    : 'Ingresa el monto total manualmente'}
+                </span>
+              </div>
+              <label className="transaction-form__switch">
+                <input
+                  className="transaction-form__switch-input"
+                  type="checkbox"
+                  checked={showQuantity}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setShowQuantity(on);
+                    if (on) {
+                      setStockEffect('INCREMENT');
+                      const upCents = unitPriceRaw || (selectedItem?.basePrice ? String(Math.round(selectedItem.basePrice * 100)) : '');
+                      if (upCents && !unitPriceRaw) {
+                        setUnitPriceRaw(upCents);
+                      }
+                      const qty = parseInt(quantity, 10);
+                      const upCentsNum = parseInt(upCents, 10);
+                      const rateVal = parseInt(dollarRate, 10) / 100;
+                      if (!isNaN(qty) && qty > 0 && !isNaN(upCentsNum) && upCentsNum > 0 && !isNaN(rateVal) && rateVal > 0) {
+                        const totalUSD = (upCentsNum / 100) * qty;
+                        setRawAmountUSD(String(Math.round(totalUSD * 100)));
+                        setRawAmountBs(String(Math.round(totalUSD * rateVal * 100)));
+                      }
+                    } else {
+                      setQuantity('');
+                      setUnitPriceRaw('');
+                      setRawAmountUSD('');
+                      setRawAmountBs('');
+                      setStockEffect('NONE');
+                    }
+                  }}
+                />
+                <span className="transaction-form__switch-slider" />
+              </label>
+            </div>
+          )}
+
+          {showQuantity && (
+            <>
+              <div className="transaction-form__grid">
+                <div className="transaction-form__field">
+                  <label className="transaction-form__label">Precio por Unidad</label>
+                  <div className="transaction-form__input-group">
+                    <span className="transaction-form__input-prefix">$</span>
+                    <input
+                      className="transaction-form__input transaction-form__input--with-prefix"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0.00"
+                      value={displayUnitPrice}
+                      onChange={(e) => handleUnitPriceChange(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="transaction-form__field">
+                  <label className="transaction-form__label">Cantidad</label>
+                  <input
+                    className="transaction-form__input"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={quantity}
+                    onChange={(e) => handleQuantityChange(e.target.value)}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="transaction-form__section-label">Moneda y Monto</div>
 
           <div className="transaction-form__grid">
-            <div className="transaction-form__field">
-              <label className="transaction-form__label">Monto USD</label>
-              <div className="transaction-form__input-group">
-                <span className="transaction-form__input-prefix">$</span>
-                <input
-                  className="transaction-form__input transaction-form__input--with-prefix"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0.00"
-                  value={displayAmountUSD}
-                  onChange={(e) => handleAmountUSDChange(e.target.value)}
-                />
+              <div className="transaction-form__field">
+                <label className="transaction-form__label">Monto USD</label>
+                <div className="transaction-form__input-group">
+                  <span className="transaction-form__input-prefix">$</span>
+                  <input
+                    className="transaction-form__input transaction-form__input--with-prefix"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0.00"
+                    value={displayAmountUSD}
+                    onChange={(e) => handleAmountUSDChange(e.target.value)}
+                    readOnly={showQuantity}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="transaction-form__field">
-              <label className="transaction-form__label">Monto Bs</label>
-              <div className="transaction-form__input-group">
-                <span className="transaction-form__input-prefix transaction-form__input-prefix--bs">Bs</span>
-                <input
-                  className="transaction-form__input transaction-form__input--with-prefix"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0.00"
-                  value={displayAmountBs}
-                  onChange={(e) => handleAmountBsChange(e.target.value)}
-                />
+              <div className="transaction-form__field">
+                <label className="transaction-form__label">Monto Bs</label>
+                <div className="transaction-form__input-group">
+                  <span className="transaction-form__input-prefix transaction-form__input-prefix--bs">Bs</span>
+                  <input
+                    className="transaction-form__input transaction-form__input--with-prefix"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0.00"
+                    value={displayAmountBs}
+                    onChange={(e) => handleAmountBsChange(e.target.value)}
+                    readOnly={showQuantity}
+                  />
+                </div>
               </div>
-            </div>
           </div>
 
           <div className="transaction-form__grid">
@@ -504,6 +627,27 @@ export default function TransactionForm({ companyId, transaction, onSave, onCanc
               </div>
             </div>
           </div>
+
+          {!category?.isDirectCost && selectedItem?.type === 'PRODUCT' && (
+            <>
+              <div className="transaction-form__section-label">Efecto en Inventario</div>
+              <div className="transaction-form__field">
+                <label className="transaction-form__label">Efecto en Inventario</label>
+                <div className="transaction-form__select-wrapper">
+                  <select
+                    className="transaction-form__select"
+                    value={stockEffect}
+                    onChange={(e) => setStockEffect(e.target.value as StockEffect)}
+                  >
+                    <option value="NONE">Sin efecto</option>
+                    <option value="INCREMENT">Aumenta stock</option>
+                    <option value="DECREMENT">Disminuye stock</option>
+                  </select>
+                  <span className="material-symbols-outlined transaction-form__select-arrow">expand_more</span>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="transaction-form__section-label">Detalles del Pago</div>
 

@@ -28,7 +28,10 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
 }
 
 function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
+  const datePart = dateStr.split('T')[0];
+  const [year, month, day] = datePart.split('-').map(Number);
+  if (!year || !month || !day) return dateStr;
+  const d = new Date(year, month - 1, day);
   return d.toLocaleDateString('es-VE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
@@ -44,12 +47,14 @@ function getPaymentMethodLabel(method: string): string {
   return (PAYMENT_METHODS as Record<string, string>)[method] ?? method;
 }
 
+
 export default function TransactionList({ companyId, onNew, onView }: TransactionListProps) {
   const { transactions, meta, isLoading, error, page, refetch, goToPage } = useTransactionList(companyId);
-
+  
   const total = meta?.total ?? 0;
   const totalPages = meta?.totalPages ?? 0;
-
+  
+  console.log('TransactionList component loaded', transactions);
   return (
     <div className="transaction-list">
       <div className="transaction-list__header">
@@ -133,13 +138,13 @@ export default function TransactionList({ companyId, onNew, onView }: Transactio
                   {transactions.map((t) => (
                     <tr key={t.id} className="transaction-list__row" onClick={() => onView?.(t)}>
                       <td className="transaction-list__td transaction-list__td--date">
-                        {formatDate(t.createdAt)}
+                        {formatDate(t.paymentDate ?? t.createdAt)}
                       </td>
                       <td className="transaction-list__td transaction-list__td--category">
                         <span className="transaction-list__category-name">{t.category.name}</span>
                       </td>
                       <td className="transaction-list__td transaction-list__td--item">
-                        {t.item?.name ?? <span className="transaction-list__empty-value">&mdash;</span>}
+                        {t.costItem?.name ?? t.item?.name ?? <span className="transaction-list__empty-value">&mdash;</span>}
                       </td>
                       <td className="transaction-list__td">
                         <span className={`transaction-list__badge transaction-list__badge--flow transaction-list__badge--${t.category.flowDirection?.toLowerCase() ?? 'inflow'}`}>

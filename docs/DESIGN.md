@@ -36,6 +36,7 @@ src/
 │   ├── unit-cost/        ← useUnitCostByBatch, useUnitCostByProduct, useUnitCostByService
 │   ├── price-margin/     ← usePriceMargin
 │   ├── balance-point/   ← useBalancePoint
+│   ├── dashboard/        ← useDashboard
 │   └── finance-chat/    ← useFinanceChat
 │
 ├── components/          ← UI pura (presentación), cada componente en su propio directorio
@@ -53,6 +54,7 @@ src/
 │   ├── unit-cost/        ← UnitCostCard, UnitCostTable
 │   ├── price-margin/     ← PriceMarginForm, PriceMarginResult
 │   ├── balance-point/   ← BalancePointCard, BreakEvenChart
+│   ├── dashboard/        ← DashboardScreen (KPI cards, chart, transactions)
 │   ├── finance-chat/    ← ChatWidget, ChatMessage
 │   └── shared/          ← Button, Input, Modal, Pagination, Skeleton, Badge, DataTable
 │
@@ -105,11 +107,13 @@ export interface Transaction {
   categoryId: string;
   itemId?: string | null;
   batchId?: string | null;
+  costItemId?: string | null;
   quantity?: number | null;
   unitPrice?: number | null;
   dollarRate: number;
   amountUSD: number;
   amountBs: number;
+  stockEffect?: 'INCREMENT' | 'DECREMENT' | 'NONE' | null;
   status: 'PENDING' | 'COMPLETED';
   paymentMethod: PaymentMethod;
   currency: 'BOLIVARES' | 'DOLARES';
@@ -199,6 +203,7 @@ infrastructure/repositories/
 ├── UnitCostRepositoryImpl.ts
 ├── PriceMarginRepositoryImpl.ts
 ├── BalancePointRepositoryImpl.ts
+├── DashboardRepositoryImpl.ts
 └── FinanceChatRepositoryImpl.ts
 ```
 
@@ -391,6 +396,7 @@ El frontend NUNCA llama a `POST /auth/login` del backend.
 | Item | POST, PATCH, GET, DELETE, fuzzy, filtros | `Item` entity, `ItemType` | `useItem` |
 | Transaction | POST (batch), PATCH, GET, DELETE, date/category filters | `Transaction` entity, `PaymentMethod` | `useTransaction` |
 | Production Batch | POST, PATCH, GET (all/by-product/by-id), DELETE | `ProductionBatch` entity | `useBatch` |
+| Dashboard | GET /dashboard/:companyId | `DashboardResponse` | `useDashboard` |
 | Cash Flow | GET total, GET by range | `CashFlowStatement`, `CashFlowSummary` | `useCashFlow` |
 | Contribution Margin | GET global, product, batch, service | `ContributionMargin`, `UnitAnalysis` | `useContribution` |
 | Gross Profit | GET global, product, service | `GrossProfitStatement`, `GrossProfitSummary` | `useGrossProfit` |

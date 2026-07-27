@@ -1,25 +1,10 @@
 import { ProductionBatch, BatchStatus } from '@/src/domain/entities/ProductionBatch';
-import { Currency, PaymentMethod, TransactionStatus } from '@/src/domain/entities/Transaction';
 import { PaginatedResult } from '@/src/domain/entities/Pagination';
 
-export interface BatchTransactionDto {
-  categoryId: string;
-  amount: number;
-  dollarRate: number;
-  quantity: number;
-  paymentMethod: PaymentMethod;
-  currency: Currency;
-  paymentReference?: string;
-  description?: string;
-  status: TransactionStatus;
-  paymentDate?: string;
-}
-
 export interface CreateBatchDto {
-  quantity: number;
-  status: BatchStatus;
-  batchDate: string;
-  transactions: BatchTransactionDto[];
+  quantity?: number;
+  status?: BatchStatus;
+  batchDate?: string;
 }
 
 export interface UpdateBatchDto {

@@ -2,6 +2,7 @@ import type { FlowDirection } from './Category';
 
 export type TransactionStatus = 'PENDING' | 'COMPLETED';
 export type Currency = 'BOLIVARES' | 'DOLARES';
+export type StockEffect = 'INCREMENT' | 'DECREMENT' | 'NONE';
 
 export type PaymentMethod =
   | 'PAGO_MOVIL'
@@ -19,6 +20,7 @@ export interface Transaction {
   categoryId: string;
   itemId: string | null;
   batchId: string | null;
+  costItemId: string | null;
   quantity: number | null;
   unitPrice: number | null;
   dollarRate: number;
@@ -30,6 +32,9 @@ export interface Transaction {
   item?:{
     name: string;
   };
+  costItem?:{
+    name: string;
+  };
   amountBs: number;
   status: TransactionStatus;
   paymentMethod: PaymentMethod;
@@ -37,6 +42,7 @@ export interface Transaction {
   paymentReference: string | null;
   description: string | null;
   paymentDate: string | null;
+  stockEffect: StockEffect | null;
   isRemoved: boolean;
   createdAt: string;
 }

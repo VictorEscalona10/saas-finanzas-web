@@ -1,0 +1,188 @@
+.cash-flow-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.cash-flow-chart__block-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1rem;
+}
+
+/* ---------- Global Donut ---------- */
+
+.cash-flow-chart__donut-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.cash-flow-chart__donut-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.cash-flow-chart__donut {
+  width: 200px;
+  height: 200px;
+  transform: rotate(-90deg);
+}
+
+.cash-flow-chart__donut-bg {
+  fill: none;
+  stroke: rgba(53, 71, 103, 0.3);
+  stroke-width: 32;
+}
+
+.cash-flow-chart__donut-segment {
+  fill: none;
+  stroke-width: 32;
+  stroke-linecap: round;
+  transition: stroke-width 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.cash-flow-chart__donut-segment:hover {
+  stroke-width: 36;
+  opacity: 0.85;
+}
+
+.cash-flow-chart__legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cash-flow-chart__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.cash-flow-chart__legend-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cash-flow-chart__legend-section {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(186, 202, 195, 0.4);
+  min-width: 5rem;
+  flex-shrink: 0;
+}
+
+.cash-flow-chart__legend-name {
+  flex: 1;
+  font-size: 0.8125rem;
+  color: rgba(186, 202, 195, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.cash-flow-chart__legend-value {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #d6e3ff;
+  flex-shrink: 0;
+  min-width: 5rem;
+  text-align: right;
+}
+
+.cash-flow-chart__legend-pct {
+  font-size: 0.6875rem;
+  color: rgba(186, 202, 195, 0.4);
+  width: 3rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ---------- Stacked Horizontal Bars ---------- */
+
+.cash-flow-chart__stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cash-flow-chart__stacked-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cash-flow-chart__stacked-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.cash-flow-chart__stacked-bar-track {
+  display: flex;
+  height: 2rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(53, 71, 103, 0.2);
+}
+
+.cash-flow-chart__stacked-bar-segment {
+  height: 100%;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.cash-flow-chart__stacked-bar-segment:hover {
+  opacity: 0.8;
+}
+
+.cash-flow-chart__stacked-total {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #d6e3ff;
+  text-align: right;
+  margin-top: 0.125rem;
+}
+
+.cash-flow-chart__stacked-total--positive {
+  color: #38debb;
+}
+
+.cash-flow-chart__stacked-total--negative {
+  color: #ffb4ab;
+}
+
+.cash-flow-chart__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: rgba(186, 202, 195, 0.4);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 1200px) {
+  .cash-flow-chart__donut-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .cash-flow-chart__donut {
+    width: 160px;
+    height: 160px;
+  }
+}

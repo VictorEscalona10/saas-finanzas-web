@@ -191,15 +191,15 @@ export default function ItemList({ companyId, onNew, onEdit }: ItemListProps) {
           <>
             <div className="item-list__table-scroll">
               <table className="item-list__table">
-                <thead>
-                  <tr>
-                    <th className="item-list__th">Nombre</th>
-                    <th className="item-list__th">Tipo</th>
-                    <th className="item-list__th item-list__th--right">Precio Base (USD)</th>
-                    <th className="item-list__th item-list__th--center">Stock</th>
-                    <th className="item-list__th item-list__th--right">Acciones</th>
-                  </tr>
-                </thead>
+<thead>
+                    <tr>
+                      <th className="item-list__th">Nombre</th>
+                      <th className="item-list__th">Tipo</th>
+                      <th className="item-list__th item-list__th--right">Precio Base (USD)</th>
+                      <th className="item-list__th item-list__th--center">Stock</th>
+                      <th className="item-list__th item-list__th--right">Acciones</th>
+                    </tr>
+                  </thead>
                 <tbody>
                   {items.map((item) => (
                     <tr key={item.id} className="item-list__row">

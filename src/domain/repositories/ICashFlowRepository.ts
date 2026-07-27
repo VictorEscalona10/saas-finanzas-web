@@ -22,8 +22,22 @@ export interface CashFlowSummary {
   net_cash_flow: number;
 }
 
+export interface DetailedCashFlowSummary {
+  current_balance: number;
+  inflow: number;
+  outflow: number;
+  pending_inflow: number;
+  pending_outflow: number;
+  net_cash_flow: number;
+}
+
 export interface CashFlowCurrencyData {
   summary: CashFlowSummary;
+  cash_flow_statement: CashFlowStatement;
+}
+
+export interface DetailedCashFlowCurrencyData {
+  summary: DetailedCashFlowSummary;
   cash_flow_statement: CashFlowStatement;
 }
 
@@ -44,8 +58,8 @@ export interface CashFlowPeriod {
 
 export interface DetailedCashFlow {
   period: CashFlowPeriod;
-  usd: CashFlowCurrencyData;
-  bs: CashFlowCurrencyData;
+  usd: DetailedCashFlowCurrencyData;
+  bs: DetailedCashFlowCurrencyData;
   transactionCount: number;
   records: unknown[];
 }
