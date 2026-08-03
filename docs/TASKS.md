@@ -210,14 +210,14 @@
 >
 > **Nota:** `IContributionMarginRepository` y tipos de respuesta ya creados en Fase 0.
 
-- [ ] **9.1** Crear `src/infrastructure/repositories/ContributionMarginRepositoryImpl.ts`
-- [ ] **9.2** Crear `src/use-cases/contribution/useContributionGlobal.ts`
-- [ ] **9.3** Crear `src/use-cases/contribution/useContributionProduct.ts`
-- [ ] **9.4** Crear `src/use-cases/contribution/useContributionService.ts`
-- [ ] **9.5** Crear `src/use-cases/contribution/useContributionByBatch.ts`
-- [ ] **9.6** Crear `src/components/contribution/ContributionCard/` — card con totalSales, totalVariableCosts, totalMargin, marginRatio (USD + Bs)
-- [ ] **9.7** Crear `src/components/contribution/ContributionTable/` — tabla unit analysis por producto
-- [ ] **9.8** Crear `app/(private)/companies/[companyId]/contribution-margin/page.tsx`
+- [x] **9.1** Crear `src/infrastructure/repositories/ContributionMarginRepositoryImpl.ts`
+- [x] **9.2** Crear `src/use-cases/contribution/useContributionGlobal.ts`
+- [x] **9.3** Crear `src/use-cases/contribution/useContributionProduct.ts`
+- [x] **9.4** Crear `src/use-cases/contribution/useContributionService.ts`
+- [x] **9.5** Crear `src/use-cases/contribution/useContributionByBatch.ts`
+- [x] **9.6** Crear `src/components/contribution/ContributionCard/` — card con totalSales, totalVariableCosts, totalMargin, marginRatio (USD + Bs)
+- [x] **9.7** Crear `src/components/contribution/ContributionTable/` — tabla unit analysis por producto
+- [x] **9.8** Crear `app/(private)/(app)/[companyId]/contribution-margin/page.tsx`
 
 ---
 
