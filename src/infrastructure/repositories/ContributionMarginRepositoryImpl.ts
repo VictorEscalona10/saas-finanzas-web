@@ -1,16 +1,20 @@
 import { createApiClientWithToken } from '@/src/infrastructure/api/apiClient';
-import type { IContributionMarginRepository, ContributionGlobal, ContributionProduct, ContributionTrendPoint } from '@/src/domain/repositories/IContributionMarginRepository';
-import { startOfMonth, endOfMonth, format, addMonths } from 'date-fns';
+import type { IContributionMarginRepository, ContributionGlobal, ContributionProduct } from '@/src/domain/repositories/IContributionMarginRepository';
 
-function generateMonthRange(startDate: string, endDate: string): string[] {
-  const months: string[] = [];
-  let current = startOfMonth(new Date(startDate));
-  const end = endOfMonth(new Date(endDate));
-  while (current <= end) {
-    months.push(format(current, 'yyyy-MM'));
-    current = addMonths(current, 1);
-  }
-  return months;
+interface GroupedRaw {
+  date: string;
+  totalSales: number;
+  totalSalesBs: number;
+  totalVariableCosts: number;
+  totalVariableCostsBs: number;
+  totalMargin: number;
+  totalMarginBs: number;
+  globalMarginRatio: number;
+  globalMarginRatioBs: number;
+}
+
+interface GlobalResponse extends Omit<ContributionGlobal, 'grouped'> {
+  grouped: GroupedRaw[];
 }
 
 export class ContributionMarginRepositoryImpl implements IContributionMarginRepository {
@@ -21,8 +25,16 @@ export class ContributionMarginRepositoryImpl implements IContributionMarginRepo
   }
 
   async getGlobal(companyId: string, startDate: string, endDate: string): Promise<ContributionGlobal> {
-    const { data } = await this.api.get<ContributionGlobal>(`/contribution-margin/global/${companyId}/${startDate}/${endDate}`);
-    return data;
+    const { data } = await this.api.get<GlobalResponse>(`/contribution-margin/global/${companyId}/${startDate}/${endDate}`);
+    return {
+      ...data,
+      grouped: (data.grouped ?? []).map((d) => ({
+        month: d.date.slice(0, 10),
+        totalSales: d.totalSales,
+        totalVariableCosts: d.totalVariableCosts,
+        totalMargin: d.totalMargin,
+      })),
+    };
   }
 
   async getProductGlobal(itemId: string, companyId: string, startDate: string, endDate: string): Promise<ContributionProduct> {
@@ -38,32 +50,5 @@ export class ContributionMarginRepositoryImpl implements IContributionMarginRepo
   async getService(itemId: string, companyId: string, startDate: string, endDate: string): Promise<ContributionProduct> {
     const { data } = await this.api.get<ContributionProduct>(`/contribution-margin/service/${itemId}/${companyId}/${startDate}/${endDate}`);
     return data;
-  }
-
-  async getTrend(companyId: string, startDate: string, endDate: string): Promise<ContributionTrendPoint[]> {
-    const months = generateMonthRange(startDate, endDate);
-    const results = await Promise.all(
-      months.map(async (month) => {
-        const monthStart = `${month}-01`;
-        const lastDay = format(endOfMonth(new Date(monthStart)), 'yyyy-MM-dd');
-        try {
-          const global = await this.getGlobal(companyId, monthStart, lastDay);
-          return {
-            month,
-            totalSales: global.totalSales,
-            totalVariableCosts: global.totalVariableCosts,
-            totalMargin: global.totalMargin,
-          };
-        } catch {
-          return {
-            month,
-            totalSales: 0,
-            totalVariableCosts: 0,
-            totalMargin: 0,
-          };
-        }
-      }),
-    );
-    return results;
   }
 }

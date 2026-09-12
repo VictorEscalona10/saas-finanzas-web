@@ -314,10 +314,6 @@ export default function DashboardScreen({ companyId, month }: DashboardScreenPro
           <span className="dashboard__quick-icon material-symbols-outlined">analytics</span>
           <span className="dashboard__quick-label">Margen</span>
         </Link>
-        <Link href="/finance-chat" className="dashboard__quick-btn dashboard__quick-btn--highlight">
-          <span className="dashboard__quick-icon material-symbols-outlined">smart_toy</span>
-          <span className="dashboard__quick-label">Chat IA</span>
-        </Link>
       </div>
     </div>
   );

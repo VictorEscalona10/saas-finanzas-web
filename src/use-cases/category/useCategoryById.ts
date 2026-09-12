@@ -19,29 +19,35 @@ export function useCategoryById(companyId: string | undefined, categoryId: strin
     error: null,
   });
 
-  const fetchCategory = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !categoryId) return;
+  const fetchCategory = useCallback(async (): Promise<Category | null> => {
+    if (!session || !isAuthenticated || !companyId || !categoryId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new CategoryRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const category = await repo.getById(companyId, categoryId);
-      setState({ category, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar categoría';
-      setState({ category: null, isLoading: false, error: message });
-    }
+    return repo.getById(companyId, categoryId);
   }, [session, isAuthenticated, companyId, categoryId]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !categoryId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const category = await fetchCategory();
+        setState({ category, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar categoría';
+        setState({ category: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, categoryId, fetchCategory]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchCategory();
+      void refetch();
     }
-  }, [sessionLoading, fetchCategory]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchCategory };
+  return { ...state, refetch };
 }

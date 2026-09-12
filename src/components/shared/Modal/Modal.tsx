@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import { usePresence } from '@/src/components/shared/hooks/usePresence';
 import './Modal.css';
 
 interface ModalProps {
@@ -12,37 +13,27 @@ interface ModalProps {
   footer?: ReactNode;
 }
 
-export default function Modal({ open, onClose, title, children, footer }: ModalProps) {
-  const [closing, setClosing] = useState(false);
-  const [mounted, setMounted] = useState(false);
+const EXIT_DURATION = 150;
 
-  useEffect(() => {
-    if (open) {
-      setMounted(true);
-      setClosing(false);
-    }
-  }, [open]);
+export default function Modal({ open, onClose, title, children, footer }: ModalProps) {
+  const { isVisible, phase } = usePresence(open, EXIT_DURATION);
 
   const handleClose = useCallback(() => {
-    setClosing(true);
-    setTimeout(() => {
-      setMounted(false);
-      onClose();
-    }, 150);
+    onClose();
   }, [onClose]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!isVisible) return;
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
     };
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
-  }, [open, handleClose]);
+  }, [isVisible, handleClose]);
 
-  if (!mounted) return null;
+  if (!isVisible) return null;
 
-  const overlayClass = `modal-overlay${closing ? ' modal-overlay--closing' : ''}`;
+  const overlayClass = `modal-overlay${phase === 'exiting' ? ' modal-overlay--closing' : ''}`;
 
   return (
     <div className={overlayClass} onClick={handleClose}>

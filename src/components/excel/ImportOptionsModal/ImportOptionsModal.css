@@ -1,0 +1,81 @@
+.import-options__intro {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.import-options__intro strong {
+  color: #00ff88;
+  font-weight: 600;
+}
+
+.import-options__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.import-options__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(0, 255, 136, 0.18);
+  border-radius: 14px;
+  background: rgba(0, 255, 136, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.import-options__option:hover {
+  background: rgba(0, 255, 136, 0.12);
+  border-color: rgba(0, 255, 136, 0.5);
+  transform: translateY(-1px);
+}
+
+.import-options__option--danger {
+  border-color: rgba(255, 107, 129, 0.3);
+  background: rgba(255, 107, 129, 0.06);
+}
+
+.import-options__option--danger:hover {
+  background: rgba(255, 107, 129, 0.12);
+  border-color: rgba(255, 107, 129, 0.6);
+}
+
+.import-options__option-icon {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: #00ff88;
+  flex-shrink: 0;
+}
+
+.import-options__option--danger .import-options__option-icon {
+  color: #ff7588;
+}
+
+.import-options__option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.import-options__option-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f0f0f0;
+}
+
+.import-options__option--danger .import-options__option-title {
+  color: #ffd7dc;
+}
+
+.import-options__option-description {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+}

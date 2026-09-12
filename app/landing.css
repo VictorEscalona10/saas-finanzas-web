@@ -29,6 +29,7 @@ html { scroll-behavior: smooth; }
   background: rgba(4, 19, 41, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(60, 74, 69, 0.5);
+  overflow: visible;
 }
 
 .landing-nav__inner {
@@ -38,30 +39,30 @@ html { scroll-behavior: smooth; }
   padding: 1rem 1.5rem;
   max-width: 1440px;
   margin: 0 auto;
-}
-
-.landing-nav__brand {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.landing-nav__logo {
-  width: 2rem; height: 2rem;
-  background: #059669;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 60px;
+  box-sizing: border-box;
 }
 
 .landing-nav__logo svg { width: 18px; height: 18px; }
 
-.landing-nav__title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
+.landing-nav__brand {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
+
+.landing-nav__logo-img {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 8px;
+  object-fit: contain;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
 
 .landing-nav__links {
   display: none;
@@ -1002,6 +1003,13 @@ html { scroll-behavior: smooth; }
 }
 
 .landing-footer__brand-icon svg { width: 12px; height: 12px; }
+
+.landing-footer__brand-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+  object-fit: contain;
+}
 
 .landing-footer__brand-name {
   font-size: 0.875rem;

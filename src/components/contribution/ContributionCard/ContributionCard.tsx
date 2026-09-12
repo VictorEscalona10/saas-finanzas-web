@@ -10,6 +10,11 @@ interface ContributionCardProps {
 
 export default function ContributionCard({ data }: ContributionCardProps) {
   const isMarginPositive = data.totalMargin >= 0;
+  const isMarginPositiveBs = data.totalMarginBs >= 0;
+  const ratioPct = data.globalMarginRatio * 100;
+  const ratioWidth = Math.max(0, Math.min(ratioPct, 100));
+  const ratioPctBs = data.globalMarginRatioBs * 100;
+  const ratioWidthBs = Math.max(0, Math.min(ratioPctBs, 100));
 
   return (
     <div className="contribution-card__grid">
@@ -54,10 +59,20 @@ export default function ContributionCard({ data }: ContributionCardProps) {
           </span>
         </div>
         <span className="contribution-card__label">Margen de Contribución</span>
-        <span className="contribution-card__primary contribution-card__primary--accent">
-          {isMarginPositive ? '+' : ''}{formatUSD(data.totalMargin)}
-        </span>
-        <span className="contribution-card__secondary">{formatBs(data.totalMarginBs)}</span>
+        <div className="contribution-card__margin-split">
+          <div className={`contribution-card__margin-item${isMarginPositive ? '' : ' contribution-card__margin-item--negative'}`}>
+            <span className="contribution-card__margin-currency">USD</span>
+            <span className={`contribution-card__margin-value${isMarginPositive ? ' contribution-card__margin-value--positive' : ''}`}>
+              {isMarginPositive ? '+' : ''}{formatUSD(data.totalMargin)}
+            </span>
+          </div>
+          <div className={`contribution-card__margin-item contribution-card__margin-item--bs${isMarginPositiveBs ? '' : ' contribution-card__margin-item--negative'}`}>
+            <span className="contribution-card__margin-currency">Bs.</span>
+            <span className={`contribution-card__margin-value${isMarginPositiveBs ? ' contribution-card__margin-value--positive-bs' : ''}`}>
+              {formatBs(data.totalMarginBs)}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="contribution-card">
@@ -72,7 +87,33 @@ export default function ContributionCard({ data }: ContributionCardProps) {
         </div>
         <span className="contribution-card__label">Ratio de Margen</span>
         <div className="contribution-card__progress">
-          <div className="contribution-card__progress-bar" style={{ width: `${Math.min(data.globalMarginRatio * 100, 100)}%` }} />
+          <div
+            className={`contribution-card__progress-bar${!isMarginPositive ? ' contribution-card__progress-bar--negative' : ''}`}
+            style={{ width: `${ratioWidth}%` }}
+          />
+        </div>
+        <div className="contribution-card__progress-labels">
+          <span>Rendimiento</span>
+          <span className="contribution-card__progress-target">Objetivo: 60%</span>
+        </div>
+      </div>
+
+      <div className="contribution-card">
+        <div className="contribution-card__header">
+          <div className="contribution-card__icon contribution-card__icon--ratio-bs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+              <path d="M21 12a9 9 0 1 1-9-9" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <span className="contribution-card__ratio-value">{formatPercentage(data.globalMarginRatioBs * 100)}</span>
+        </div>
+        <span className="contribution-card__label">Ratio de Margen (Bs)</span>
+        <div className="contribution-card__progress">
+          <div
+            className={`contribution-card__progress-bar${!isMarginPositiveBs ? ' contribution-card__progress-bar--negative' : ''}`}
+            style={{ width: `${ratioWidthBs}%` }}
+          />
         </div>
         <div className="contribution-card__progress-labels">
           <span>Rendimiento</span>

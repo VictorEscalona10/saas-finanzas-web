@@ -29,7 +29,13 @@ body{
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  margin-bottom: 2.5rem;
+  /* margin-bottom: 2.5rem; */
+}
+
+.register-page__brand-logo {
+  width: 10rem;
+  height: 10rem;
+  object-fit: contain;
 }
 
 .register-page__brand-name {

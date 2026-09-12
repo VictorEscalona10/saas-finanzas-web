@@ -19,29 +19,35 @@ export function useContributionProduct(itemId: string | undefined, companyId: st
     error: null,
   });
 
-  const fetchProduct = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !itemId) return;
+  const fetchProduct = useCallback(async (): Promise<ContributionProduct | null> => {
+    if (!session || !isAuthenticated || !companyId || !itemId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new ContributionMarginRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const data = await repo.getProductGlobal(itemId, companyId, startDate, endDate);
-      setState({ data, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar margen de contribución del producto';
-      setState({ data: null, isLoading: false, error: message });
-    }
+    return repo.getProductGlobal(itemId, companyId, startDate, endDate);
   }, [session, isAuthenticated, companyId, itemId, startDate, endDate]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !itemId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const data = await fetchProduct();
+        setState({ data, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar margen de contribución del producto';
+        setState({ data: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, itemId, fetchProduct]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchProduct();
+      void refetch();
     }
-  }, [sessionLoading, fetchProduct]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchProduct };
+  return { ...state, refetch };
 }

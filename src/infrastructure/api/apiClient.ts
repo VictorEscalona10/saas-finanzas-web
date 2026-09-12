@@ -1,5 +1,26 @@
-import axios from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { API_BASE_URL } from '@/src/shared/constants';
+
+function rejectWithError(error: AxiosError): Promise<never> {
+  if (!error.response) {
+    return Promise.reject(new Error('Error de conexión con el servidor'));
+  }
+
+  const { status, data } = error.response;
+  const serverData = data as { message?: string | string[] } | undefined;
+
+  if (status === 401) {
+    return Promise.reject(new Error('No autorizado'));
+  }
+
+  if (status >= 400 && status < 500) {
+    const raw = serverData?.message;
+    const message = Array.isArray(raw) ? raw.join('. ') : raw || 'Datos inválidos';
+    return Promise.reject(new Error(message));
+  }
+
+  return Promise.reject(new Error('Error del servidor'));
+}
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -9,12 +30,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (!error.response) {
-      return Promise.reject(new Error('Error de conexión con el servidor'));
-    }
-    return Promise.reject(error);
-  }
+  (error: AxiosError) => rejectWithError(error)
 );
 
 export function createApiClientWithToken(token: string) {
@@ -29,12 +45,7 @@ export function createApiClientWithToken(token: string) {
 
   client.interceptors.response.use(
     (response) => response,
-    (error) => {
-      if (!error.response) {
-        return Promise.reject(new Error('Error de conexión con el servidor'));
-      }
-      return Promise.reject(error);
-    }
+    (error: AxiosError) => rejectWithError(error)
   );
 
   return client;

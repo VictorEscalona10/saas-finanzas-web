@@ -19,29 +19,35 @@ export function useContributionGlobal(companyId: string | undefined, startDate: 
     error: null,
   });
 
-  const fetchGlobal = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId) return;
+  const fetchGlobal = useCallback(async (): Promise<ContributionGlobal | null> => {
+    if (!session || !isAuthenticated || !companyId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new ContributionMarginRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const data = await repo.getGlobal(companyId, startDate, endDate);
-      setState({ data, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar margen de contribución global';
-      setState({ data: null, isLoading: false, error: message });
-    }
+    return repo.getGlobal(companyId, startDate, endDate);
   }, [session, isAuthenticated, companyId, startDate, endDate]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const data = await fetchGlobal();
+        setState({ data, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar margen de contribución global';
+        setState({ data: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, fetchGlobal]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchGlobal();
+      void refetch();
     }
-  }, [sessionLoading, fetchGlobal]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchGlobal };
+  return { ...state, refetch };
 }

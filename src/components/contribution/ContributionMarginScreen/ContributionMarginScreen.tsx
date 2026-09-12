@@ -1,12 +1,16 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { subMonths, format } from 'date-fns';
+import { startOfMonth, format } from 'date-fns';
 import { useContributionGlobal } from '@/src/use-cases/contribution/useContributionGlobal';
-import { useContributionTrend } from '@/src/use-cases/contribution/useContributionTrend';
+import { useContributionProduct } from '@/src/use-cases/contribution/useContributionProduct';
+import { useContributionService } from '@/src/use-cases/contribution/useContributionService';
+import { useContributionByBatch } from '@/src/use-cases/contribution/useContributionByBatch';
 import ContributionCard from '@/src/components/contribution/ContributionCard';
-import ContributionTable from '@/src/components/contribution/ContributionTable';
 import ContributionTrendChart from '@/src/components/contribution/ContributionTrendChart';
+import ContributionFilters from '@/src/components/contribution/ContributionFilters';
+import ContributionDetail from '@/src/components/contribution/ContributionDetail';
+import ContributionSelector, { type ContributionView } from '@/src/components/contribution/ContributionSelector';
 import type { ContributionTrendPoint } from '@/src/domain/repositories/IContributionMarginRepository';
 import './ContributionMarginScreen.css';
 
@@ -54,30 +58,15 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-type TrendPeriod = '6M' | '12M' | 'YTD';
-
-const defaultStartDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-const defaultEndDate = new Date().toISOString().split('T')[0];
-
-function getTrendRange(period: TrendPeriod): { start: string; end: string } {
-  const end = new Date();
-  const endStr = format(end, 'yyyy-MM-dd');
-  let start: Date;
-  if (period === 'YTD') {
-    start = new Date(end.getFullYear(), 0, 1);
-  } else {
-    const months = period === '6M' ? 6 : 12;
-    start = subMonths(end, months);
-  }
-  return { start: format(start, 'yyyy-MM-dd'), end: endStr };
-}
+const today = new Date();
+const defaultStartDate = format(startOfMonth(today), 'yyyy-MM-dd');
+const defaultEndDate = format(today, 'yyyy-MM-dd');
 
 export default function ContributionMarginScreen({ companyId }: ContributionMarginScreenProps) {
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);
-  const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('12M');
-
-  const trendRange = useMemo(() => getTrendRange(trendPeriod), [trendPeriod]);
+  const [view, setView] = useState<ContributionView>('global');
+  const [selectedId, setSelectedId] = useState('');
 
   const {
     data: globalData,
@@ -87,42 +76,45 @@ export default function ContributionMarginScreen({ companyId }: ContributionMarg
   } = useContributionGlobal(companyId, startDate, endDate);
 
   const {
-    data: trendData,
-    isLoading: trendLoading,
-    error: trendError,
-    refetch: refetchTrend,
-  } = useContributionTrend(companyId, trendRange.start, trendRange.end);
+    data: productData,
+    isLoading: productLoading,
+    error: productError,
+    refetch: refetchProduct,
+  } = useContributionProduct(selectedId || undefined, companyId, startDate, endDate);
+
+  const {
+    data: serviceData,
+    isLoading: serviceLoading,
+    error: serviceError,
+    refetch: refetchService,
+  } = useContributionService(selectedId || undefined, companyId, startDate, endDate);
+
+  const {
+    data: batchData,
+    isLoading: batchLoading,
+    error: batchError,
+    refetch: refetchBatch,
+  } = useContributionByBatch(selectedId || undefined, companyId);
 
   const chartData: ContributionTrendPoint[] = useMemo(() => {
-    const currentMonth = format(new Date(), 'yyyy-MM');
-
-    if (!globalData) return trendData;
-
-    const currentPoint: ContributionTrendPoint = {
-      month: currentMonth,
-      totalSales: globalData.totalSales,
-      totalVariableCosts: globalData.totalVariableCosts,
-      totalMargin: globalData.totalMargin,
-    };
-
-    if (trendData.length === 0) return [currentPoint];
-
-    const hasRealData = trendData.some(
+    return (globalData?.grouped ?? []).filter(
       (d) => d.totalSales !== 0 || d.totalVariableCosts !== 0 || d.totalMargin !== 0,
     );
-    if (!hasRealData) return [currentPoint];
-
-    const hasCurrent = trendData.some((d) => d.month === currentMonth);
-    if (!hasCurrent) {
-      return [...trendData.filter((d) => d.month !== currentMonth), currentPoint];
-    }
-
-    return trendData.map((d) => (d.month === currentMonth ? { ...d, ...currentPoint } : d));
-  }, [trendData, globalData]);
+  }, [globalData]);
 
   const handleRetry = useCallback(() => {
     refetchGlobal();
   }, [refetchGlobal]);
+
+  const handleRangeChange = useCallback((start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+  }, []);
+
+  const handleViewChange = useCallback((nextView: ContributionView) => {
+    setView(nextView);
+    setSelectedId('');
+  }, []);
 
   if (globalLoading) return <Skeleton />;
 
@@ -139,34 +131,107 @@ export default function ContributionMarginScreen({ companyId }: ContributionMarg
         </p>
       </div>
 
-      <div className="contribution-margin-screen__section">
-        <ContributionCard data={globalData} />
-      </div>
+      <ContributionFilters startDate={startDate} endDate={endDate} onChange={handleRangeChange} />
 
-      <div className="contribution-margin-screen__section">
-        <div className="contribution-margin-screen__trend-controls">
-          <div className="contribution-margin-screen__trend-periods">
-            {(['6M', '12M', 'YTD'] as TrendPeriod[]).map((p) => (
-              <button
-                key={p}
-                className={`contribution-margin-screen__period-btn${trendPeriod === p ? ' contribution-margin-screen__period-btn--active' : ''}`}
-                onClick={() => setTrendPeriod(p)}
-              >
-                {p === 'YTD' ? 'YTD' : `Últ. ${p}`}
-              </button>
-            ))}
+      <ContributionSelector
+        view={view}
+        onViewChange={handleViewChange}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        companyId={companyId}
+      />
+
+      {view === 'global' && (
+        <>
+          <div className="contribution-margin-screen__section">
+            <ContributionCard data={globalData} />
           </div>
-          {trendError && (
-            <span className="contribution-margin-screen__trend-error">
-              Error al cargar tendencia
-              <button className="contribution-margin-screen__trend-retry" onClick={refetchTrend}>
-                Reintentar
-              </button>
-            </span>
+
+          <div className="contribution-margin-screen__section">
+            <ContributionTrendChart data={chartData} isLoading={globalLoading} startDate={startDate} endDate={endDate} />
+          </div>
+        </>
+      )}
+
+      {view === 'product' && (
+        <div className="contribution-margin-screen__section">
+          {selectedId ? (
+            <ContributionDetail
+              data={productData}
+              loading={productLoading}
+              error={productError}
+              onRetry={refetchProduct}
+            />
+          ) : (
+            <div className="contribution-margin-screen__empty">
+              <div className="contribution-margin-screen__empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                  <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
+              </div>
+              <p className="contribution-margin-screen__empty-title">Selecciona un producto</p>
+              <p className="contribution-margin-screen__empty-desc">
+                Usa el buscador de arriba para encontrar un producto y visualizar su análisis de margen de contribución.
+              </p>
+            </div>
           )}
         </div>
-        <ContributionTrendChart data={chartData} isLoading={trendLoading} />
-      </div>
+      )}
+
+      {view === 'service' && (
+        <div className="contribution-margin-screen__section">
+          {selectedId ? (
+            <ContributionDetail
+              data={serviceData}
+              loading={serviceLoading}
+              error={serviceError}
+              onRetry={refetchService}
+            />
+          ) : (
+            <div className="contribution-margin-screen__empty">
+              <div className="contribution-margin-screen__empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </div>
+              <p className="contribution-margin-screen__empty-title">Selecciona un servicio</p>
+              <p className="contribution-margin-screen__empty-desc">
+                Usa el buscador de arriba para encontrar un servicio y visualizar su análisis de margen de contribución.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {view === 'batch' && (
+        <div className="contribution-margin-screen__section">
+          {selectedId ? (
+            <ContributionDetail
+              data={batchData}
+              loading={batchLoading}
+              error={batchError}
+              onRetry={refetchBatch}
+            />
+          ) : (
+            <div className="contribution-margin-screen__empty">
+              <div className="contribution-margin-screen__empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="40" height="40">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                  <line x1="12" y1="22.08" x2="12" y2="12" />
+                </svg>
+              </div>
+              <p className="contribution-margin-screen__empty-title">Selecciona un lote</p>
+              <p className="contribution-margin-screen__empty-desc">
+                Usa el buscador de arriba para encontrar un lote de producción y visualizar su análisis de margen de contribución.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

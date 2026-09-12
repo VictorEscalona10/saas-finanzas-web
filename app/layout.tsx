@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SaaS Finanzas",
   description: "Plataforma de gestión financiera inteligente",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -26,6 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -33,8 +37,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               document.addEventListener('mousemove', function(e) {
-                document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
-                document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
                 document.querySelectorAll('.liquid-card, .liquid-glass').forEach(function(el) {
                   var rect = el.getBoundingClientRect();
                   var x = ((e.clientX - rect.left) / rect.width) * 100;

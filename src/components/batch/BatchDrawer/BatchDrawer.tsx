@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback, type ReactNode } from 'react';
+import { useEffect, useCallback, type ReactNode } from 'react';
+import { usePresence } from '@/src/components/shared/hooks/usePresence';
 import './BatchDrawer.css';
 
 interface BatchDrawerProps {
@@ -14,41 +15,26 @@ interface BatchDrawerProps {
 }
 
 export default function BatchDrawer({ open, onClose, title, subtitle, children, footer, disableClose }: BatchDrawerProps) {
-  const [mounted, setMounted] = useState(false);
-  const [animate, setAnimate] = useState<'entering' | 'entered'>('entering');
+  const { isVisible, phase } = usePresence(open, 400, 400);
+  const animate = phase === 'entered' ? 'entered' : 'entering';
 
   useEffect(() => {
-    if (open) {
-      setMounted(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setAnimate('entered');
-        });
-      });
-    } else {
-      setAnimate('entering');
-      const timer = setTimeout(() => setMounted(false), 400);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
+    if (!isVisible) return;
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !disableClose) onClose();
     };
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
-  }, [open, onClose, disableClose]);
+  }, [isVisible, onClose, disableClose]);
 
   const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget && !disableClose) onClose();
   }, [onClose, disableClose]);
 
-  if (!mounted) return null;
+  if (!isVisible) return null;
 
   return (
-    <div className={`batch-drawer${!mounted ? ' batch-drawer--hidden' : ''}`}>
+    <div className="batch-drawer">
       <div
         className={`batch-drawer__backdrop batch-drawer__backdrop--${animate}`}
         onClick={handleBackdropClick}

@@ -8,7 +8,10 @@ import type { Transaction } from '@/src/domain/entities/Transaction';
 import TransactionDetailModal from '@/src/components/transaction/TransactionDetailModal';
 import TransactionDrawer from '@/src/components/transaction/TransactionDrawer';
 import TransactionForm from '@/src/components/transaction/TransactionForm';
+import BatchDrawer from '@/src/components/batch/BatchDrawer';
+import BatchForm from '@/src/components/batch/BatchForm';
 import Button from '@/src/components/shared/Button';
+import Badge from '@/src/components/shared/Badge';
 import Skeleton from '@/src/components/shared/Skeleton';
 import './BatchDetail.css';
 
@@ -40,13 +43,15 @@ function getPaymentMethodLabel(method: string): string {
 
 export default function BatchDetail({ companyId, batchId, onNewTransaction }: BatchDetailProps) {
   const { batch, isLoading, error, refetch } = useBatchById(companyId, batchId);
-  const { deleteTransaction } = useDeleteTransaction();
+  const { deleteTransaction, error: deleteError } = useDeleteTransaction();
 
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [editBatchOpen, setEditBatchOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingBatch, setSavingBatch] = useState(false);
 
   const handleView = useCallback((tx: Transaction) => {
     setSelectedTransaction(tx);
@@ -61,8 +66,8 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
     }
   }, [selectedTransaction]);
 
-  const handleDelete = useCallback(async () => {
-    if (!selectedTransaction) return;
+  const handleDelete = useCallback(async (): Promise<boolean> => {
+    if (!selectedTransaction) return false;
     setDeleting(true);
     const success = await deleteTransaction(companyId, selectedTransaction.id);
     if (success) {
@@ -71,6 +76,7 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
       refetch();
     }
     setDeleting(false);
+    return success;
   }, [companyId, deleteTransaction, selectedTransaction, refetch]);
 
   const handleEditSaved = useCallback(() => {
@@ -82,6 +88,19 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
   const handleCancelEdit = useCallback(() => {
     setEditDrawerOpen(false);
     setSelectedTransaction(null);
+  }, []);
+
+  const handleEditBatch = useCallback(() => {
+    setEditBatchOpen(true);
+  }, []);
+
+  const handleBatchEditSaved = useCallback(() => {
+    setEditBatchOpen(false);
+    refetch();
+  }, [refetch]);
+
+  const handleCancelBatchEdit = useCallback(() => {
+    setEditBatchOpen(false);
   }, []);
 
   if (isLoading) {
@@ -138,10 +157,16 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
             Información del lote y transacciones asociadas.
           </p>
         </div>
-        <Button variant="primary" size="lg" onClick={onNewTransaction}>
-          <span className="material-symbols-outlined">add_circle</span>
-          Crear Transacción
-        </Button>
+        <div className="batch-detail__actions">
+          <Button variant="outline" size="lg" onClick={handleEditBatch}>
+            <span className="material-symbols-outlined">edit</span>
+            Editar Lote
+          </Button>
+          <Button variant="primary" size="lg" onClick={onNewTransaction}>
+            <span className="material-symbols-outlined">add_circle</span>
+            Crear Transacción
+          </Button>
+        </div>
       </div>
 
       <div className="batch-detail__info-grid">
@@ -171,66 +196,62 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
 
       <h2 className="batch-detail__section-title">Transacciones del Lote</h2>
 
-      <div className="batch-detail__table-container">
-        {transactions.length === 0 ? (
-          <div className="batch-detail__empty">
-            <div className="batch-detail__empty-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>receipt_long</span>
-            </div>
-            <h3 className="batch-detail__empty-title">No hay transacciones</h3>
-            <p className="batch-detail__empty-text">
-              Este lote no tiene transacciones asociadas. Crea una para comenzar.
-            </p>
+      {transactions.length === 0 ? (
+        <div className="batch-detail__empty">
+          <div className="batch-detail__empty-icon">
+            <span className="material-symbols-outlined" style={{ fontSize: '3rem' }}>receipt_long</span>
           </div>
-        ) : (
-          <div className="batch-detail__table-scroll">
-            <table className="batch-detail__table">
-              <thead>
-                <tr>
-                  <th className="batch-detail__th">Fecha</th>
-                  <th className="batch-detail__th">Categoría</th>
-                  <th className="batch-detail__th">Tipo</th>
-                  <th className="batch-detail__th batch-detail__th--right">Monto USD</th>
-                  <th className="batch-detail__th batch-detail__th--right">Monto Bs</th>
-                  <th className="batch-detail__th">Método</th>
-                  <th className="batch-detail__th">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((t) => (
-                  <tr key={t.id} className="batch-detail__row" onClick={() => handleView(t)}>
-                    <td className="batch-detail__td batch-detail__td--date">
-                      {formatDate(t.paymentDate ?? t.createdAt)}
-                    </td>
-                    <td className="batch-detail__td batch-detail__td--category">
-                      <span className="batch-detail__category-name">{t.category?.name ?? t.categoryId}</span>
-                    </td>
-                    <td className="batch-detail__td">
-                      <span className={`batch-detail__badge batch-detail__badge--flow batch-detail__badge--${t.category?.flowDirection?.toLowerCase() ?? 'inflow'}`}>
-                        {t.category?.flowDirection === 'OUTFLOW' ? '↓ Egreso' : '↑ Ingreso'}
-                      </span>
-                    </td>
-                    <td className="batch-detail__td batch-detail__td--right batch-detail__td--amount">
-                      {formatUSD(t.amountUSD)}
-                    </td>
-                    <td className="batch-detail__td batch-detail__td--right batch-detail__td--amount">
-                      {formatBs(t.amountBs)}
-                    </td>
-                    <td className="batch-detail__td batch-detail__td--method">
-                      {getPaymentMethodLabel(t.paymentMethod)}
-                    </td>
-                    <td className="batch-detail__td">
-                      <span className={`batch-detail__badge batch-detail__badge--${t.status.toLowerCase()}`}>
-                        {t.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+          <h3 className="batch-detail__empty-title">No hay transacciones</h3>
+          <p className="batch-detail__empty-text">
+            Este lote no tiene transacciones asociadas. Crea una para comenzar.
+          </p>
+        </div>
+      ) : (
+        <div className="batch-detail__tx-grid">
+          {transactions.map((t) => {
+            const isInflow = t.category?.flowDirection !== 'OUTFLOW';
+            return (
+              <div key={t.id} className="batch-detail__tx-card" onClick={() => handleView(t)}>
+                <div className="batch-detail__tx-header">
+                  <Badge variant={isInflow ? 'success' : 'danger'} size="sm" dot>
+                    {isInflow ? '↑ Ingreso' : '↓ Egreso'}
+                  </Badge>
+                  <span className="batch-detail__tx-date">
+                    {formatDate(t.paymentDate ?? t.createdAt)}
+                  </span>
+                </div>
+
+                <div className="batch-detail__tx-body">
+                  <span className="batch-detail__tx-category">{t.category?.name ?? t.categoryId}</span>
+                </div>
+
+                <div className="batch-detail__tx-amounts">
+                  <div className="batch-detail__tx-amount batch-detail__tx-amount--usd">
+                    <span className="batch-detail__tx-amount-label">USD</span>
+                    <span className="batch-detail__tx-amount-value">{formatUSD(t.amountUSD)}</span>
+                  </div>
+                  <div className="batch-detail__tx-amount batch-detail__tx-amount--bs">
+                    <span className="batch-detail__tx-amount-label">Bs</span>
+                    <span className="batch-detail__tx-amount-value">{formatBs(t.amountBs)}</span>
+                  </div>
+                </div>
+
+                <div className="batch-detail__tx-footer">
+                  <span className="batch-detail__tx-method">
+                    {getPaymentMethodLabel(t.paymentMethod)}
+                  </span>
+                  <Badge
+                    variant={t.status === 'COMPLETED' ? 'success' : 'warning'}
+                    size="sm"
+                  >
+                    {t.status === 'COMPLETED' ? 'Completado' : 'Pendiente'}
+                  </Badge>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <TransactionDetailModal
         open={detailOpen}
@@ -239,6 +260,7 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
         onEdit={handleDetailEdit}
         onDelete={handleDelete}
         deleting={deleting}
+        deleteError={deleteError}
       />
 
       <TransactionDrawer
@@ -275,6 +297,40 @@ export default function BatchDetail({ companyId, batchId, onNewTransaction }: Ba
           onLoadingChange={setSaving}
         />
       </TransactionDrawer>
+
+      <BatchDrawer
+        open={editBatchOpen}
+        onClose={handleCancelBatchEdit}
+        disableClose={savingBatch}
+        title="Editar Lote"
+        subtitle="Modifica los datos del lote seleccionado."
+        footer={
+          <>
+            <Button variant="outline" size="lg" onClick={handleCancelBatchEdit} disabled={savingBatch}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              type="submit"
+              form="batch-edit-form"
+              loading={savingBatch}
+            >
+              {savingBatch ? 'Guardando...' : 'Actualizar'}
+            </Button>
+          </>
+        }
+      >
+        <BatchForm
+          companyId={companyId}
+          batch={batch}
+          onSave={handleBatchEditSaved}
+          onCancel={handleCancelBatchEdit}
+          id="batch-edit-form"
+          hideFooter
+          onLoadingChange={setSavingBatch}
+        />
+      </BatchDrawer>
     </div>
   );
 }

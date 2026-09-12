@@ -1,0 +1,76 @@
+.excel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(56, 222, 187, 0.16);
+  border-radius: 10px;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(10, 25, 47, 0.5),
+    rgba(2, 12, 26, 0.9));
+}
+
+.excel-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.excel-toolbar__divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 2px;
+  background: rgba(56, 222, 187, 0.15);
+}
+
+.excel-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid rgba(56, 222, 187, 0.18);
+  border-radius: 8px;
+  background: rgba(56, 222, 187, 0.06);
+  color: rgba(214, 227, 255, 0.85);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.excel-toolbar__btn:hover:not(:disabled) {
+  background: rgba(56, 222, 187, 0.14);
+  border-color: rgba(56, 222, 187, 0.45);
+  color: #38debb;
+}
+
+.excel-toolbar__btn:active:not(:disabled) {
+  background: rgba(56, 222, 187, 0.2);
+}
+
+.excel-toolbar__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.excel-toolbar__btn--danger:hover:not(:disabled) {
+  background: rgba(255, 107, 129, 0.12);
+  border-color: rgba(255, 107, 129, 0.4);
+  color: #ff7588;
+}
+
+.excel-toolbar__btn--danger:active:not(:disabled) {
+  background: rgba(255, 107, 129, 0.2);
+}
+
+.excel-toolbar__icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.excel-toolbar__label {
+  font-size: 0.8125rem;
+}

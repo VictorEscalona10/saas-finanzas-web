@@ -37,14 +37,9 @@ export default function RegisterForm() {
       <div className="register-page">
         <div className="register-page__form-panel register-page__form-panel--centered">
           <div className="register-page__brand">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <rect width="28" height="28" rx="6" fill="#059669" />
-              <path d="M14 6L14 22M14 6L9 11M14 6L19 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M8 18H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <img src="/logo.png" alt="FinanzaVzla" width="28" height="28" className="register-page__brand-logo" />
             <span className="register-page__brand-name">FinanzaVzla</span>
           </div>
-          <h1 className="register-page__title">Verifica tu correo</h1>
           <p className="register-page__subtitle">
             Hemos enviado un enlace de confirmación a <strong>{registeredEmail}</strong>.
           </p>
@@ -66,12 +61,9 @@ export default function RegisterForm() {
     <div className="register-page">
       <div className="register-page__form-panel">
         <div className="register-page__brand">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="6" fill="#059669" />
-            <path d="M14 6L14 22M14 6L9 11M14 6L19 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M8 18H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          <span className="register-page__brand-name">FinanzaVzla</span>
+          <Link href="/">
+            <img src="/logo.png" alt="FinanzaVzla" width="28" height="28" className="register-page__brand-logo" />
+          </Link>
         </div>
 
         <div className="register-page__welcome">

@@ -19,29 +19,35 @@ export function useCashFlowTotal(companyId: string | undefined) {
     error: null,
   });
 
-  const fetchTotal = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId) return;
+  const fetchTotal = useCallback(async (): Promise<TotalCashFlow | null> => {
+    if (!session || !isAuthenticated || !companyId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new CashFlowRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const data = await repo.getTotal(companyId);
-      setState({ data, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar flujo de caja';
-      setState({ data: null, isLoading: false, error: message });
-    }
+    return repo.getTotal(companyId);
   }, [session, isAuthenticated, companyId]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const data = await fetchTotal();
+        setState({ data, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar flujo de caja';
+        setState({ data: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, fetchTotal]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchTotal();
+      void refetch();
     }
-  }, [sessionLoading, fetchTotal]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchTotal };
+  return { ...state, refetch };
 }

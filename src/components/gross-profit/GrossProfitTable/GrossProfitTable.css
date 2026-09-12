@@ -1,0 +1,179 @@
+.gross-profit-table__wrapper {
+  border: 1px solid rgba(0, 228, 121, 0.1);
+  border-radius: 24px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(16, 25, 47, 0.7),
+    rgba(4, 19, 41, 0.9));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.gross-profit-table__scroll {
+  overflow-x: auto;
+}
+
+.gross-profit-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.gross-profit-table__header {
+  padding: 1rem 1.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #00e479;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.gross-profit-table__header--right {
+  text-align: right;
+}
+
+.gross-profit-table__body {
+  border-collapse: collapse;
+}
+
+.gross-profit-table__row {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gross-profit-table__row:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+}
+
+.gross-profit-table__cell {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.gross-profit-table__cell--right {
+  text-align: right;
+}
+
+.gross-profit-table__product-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #d6e3ff;
+}
+
+.gross-profit-table__product-id {
+  font-size: 0.6875rem;
+  color: rgba(0, 228, 121, 0.5);
+  margin-top: 0.25rem;
+}
+
+.gross-profit-table__currency {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #d6e3ff;
+}
+
+.gross-profit-table__currency--bs {
+  font-size: 0.8125rem;
+  color: #849585;
+}
+
+.gross-profit-table__currency--bs-negative {
+  color: rgba(255, 180, 171, 0.7);
+}
+
+.gross-profit-table__margin {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #00e479;
+}
+
+.gross-profit-table__margin--negative {
+  color: #ffb4ab;
+}
+
+.gross-profit-table__ratio {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #00e479;
+  background: rgba(0, 228, 121, 0.1);
+  padding: 0.125rem 0.625rem;
+  border-radius: 8px;
+}
+
+.gross-profit-table__ratio--negative {
+  color: #ffb4ab;
+  background: rgba(255, 180, 171, 0.1);
+}
+
+.gross-profit-table__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: rgba(255, 255, 255, 0.3);
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.gross-profit-table__empty-icon {
+  width: 3rem;
+  height: 3rem;
+  opacity: 0.5;
+}
+
+.gross-profit-table__loading {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gross-profit-table__loading-row {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gross-profit-table__skeleton {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  animation: gross-profit-table-pulse 1.5s ease-in-out infinite;
+}
+
+.gross-profit-table__skeleton--text {
+  flex: 2;
+  height: 1rem;
+}
+
+.gross-profit-table__skeleton--price {
+  flex: 1.5;
+  height: 1rem;
+}
+
+.gross-profit-table__skeleton--ratio {
+  flex: 0.75;
+  height: 1rem;
+}
+
+@keyframes gross-profit-table-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@media (max-width: 768px) {
+  .gross-profit-table__cell {
+    padding: 0.75rem 1rem;
+  }
+
+  .gross-profit-table__header {
+    padding: 0.75rem 1rem;
+  }
+}

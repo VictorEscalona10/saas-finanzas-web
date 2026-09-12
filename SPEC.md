@@ -29,6 +29,7 @@
 5. [Manejo de Errores](#5-manejo-de-errores)
 6. [Headers Globales](#6-headers-globales)
 7. [Estado de Implementación](#7-estado-de-implementación)
+8. [Normas de Frontend — Prevención de Deuda Técnica](#8-normas-de-frontend--prevención-de-deuda-técnica)
 
 ---
 
@@ -841,7 +842,17 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
 
 #### `GET /contribution-margin/global/:companyId/:startDate/:endDate`
 
-**Response:**
+**Query param opcional:** `groupBy=auto`
+
+Sin `groupBy` (default): retorna un objeto ContributionGlobal con los totales agregados del rango completo.
+
+Con `?groupBy=auto`: retorna un array con un objeto por período (día o mes),decidiendo automáticamente según la cantidad de días del rango:
+- ≤ 30 días → granularidad diaria (un objeto por día)
+- > 30 días → granularidad mensual (un objeto por mes)
+
+Los días/meses sin datos incluyen valores en 0. El campo `date` usa formato ISO (`2026-08-01` para diario, `2026-08-01` para mensual — primer día del mes).
+
+**Response sin `groupBy`:**
 ```json
 {
   "totalSales": 25000.00,
@@ -853,6 +864,23 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
   "globalMarginRatio": 0.60,
   "globalMarginRatioBs": 0.60
 }
+```
+
+**Response con `?groupBy=auto`:**
+```json
+[
+  {
+    "date": "2026-08-01",
+    "totalSales": 850.00,
+    "totalSalesBs": 68425.00,
+    "totalVariableCosts": 340.00,
+    "totalVariableCostsBs": 27370.00,
+    "totalMargin": 510.00,
+    "totalMarginBs": 41055.00,
+    "globalMarginRatio": 0.60,
+    "globalMarginRatioBs": 0.60
+  }
+]
 ```
 
 ---
@@ -933,11 +961,24 @@ Auth: **Todos** requieren JWT + ValidateCompanyGuard
     "salesVolumeRequired": 13333.33,
     "salesVolumeRequiredBs": 1073333.33,
     "isSafe": true,
+    "isSafeUsd": true,
+    "isSafeBs": true,
     "distanceToBreakEven": 4666.67,
-    "distanceToBreakEvenBs": 375666.67
+    "distanceToBreakEvenBs": 375666.67,
+    "marginStatus": "safe",
+    "marginStatusUsd": "safe",
+    "marginStatusBs": "safe"
   }
 }
 ```
+
+**Notas:**
+- Campos por moneda: `isSafeUsd`/`isSafeBs` (una moneda está "segura" si sus ventas ≥ su propio equilibrio y su margen de contribución > 0; pueden divergir porque `dollarRate` varía entre transacciones) y `marginStatusUsd`/`marginStatusBs` (`negative` | `safe` | `at_risk`).
+- `isSafe` = `isSafeUsd && isSafeBs` (solo `true` si AMBAS monedas están seguras).
+- `marginStatus` (global): `negative` si USD **o** Bs tiene margen ≤ 0; `safe` solo si ambas son `safe`; en otro caso `at_risk`.
+- `distanceToBreakEven` positivo = por encima del equilibrio, negativo = por debajo.
+- Cuando el `marginStatus` de una moneda es `negative`, sus `salesVolumeRequired` y `distanceToBreakEven` vienen como `null` (NO alcanzable, nunca mostrarlo como `0`).
+- `globalMarginRatio` viene ya en porcentaje (p.ej. `60.0` = 60%, `-26.92` = margen negativo).
 
 ---
 
@@ -1256,6 +1297,85 @@ El backend acepta los orígenes definidos en `FRONTEND_URL` (variable de entorno
 | Sistema de Pagos (Stripe/PayPal) | Sección 5.12 |
 | Reportes PDF/Excel/Chart | Sección 5.13 |
 | Suscripciones y Planes | Sección 3 (Plan, Subscription models exist but no endpoints) |
+
+---
+
+## 8. Normas de Frontend — Prevención de Deuda Técnica
+
+> **Propósito:** documentar las normas obligatorias de frontend para que **no vuelva a ocurrir** la deuda técnica de "estado actualizado síncronamente en effects" (`react-hooks/set-state-in-effect`), que dejó 29 errores de lint en 28 archivos.
+
+### 8.1 Contexto histórico
+
+La regla `react-hooks/set-state-in-effect` (introducida por `eslint-plugin-react-hooks@7.1.1`, bundled con `eslint-config-next@16.2.4`) prohíbe llamar `setState` de forma **síncrona** dentro del cuerpo de un `useEffect`. El código anterior a la actualización a Next 16 / React 19 usaba este anti-patrón ampliamente, generando errores de lint que bloquean CI/build.
+
+> Los errores NO se resolvieron silenciando la regla: se corrigieron de raíz reestructurando los componentes y hooks afectados (ver `tasks.md` para el plan de refactor).
+
+### 8.2 Reglas obligatorias
+
+#### R1 — No actualizar estado síncronamente en un effect
+
+**Prohibido** llamar `setState` de forma síncrona en el cuerpo de un `useEffect`:
+
+```typescript
+// ❌ Prohibido
+const [fullName, setFullName] = useState('');
+useEffect(() => { setFullName(`${first} ${last}`); }, [first, last]);
+
+// ✅ Permitido: derivar durante el render
+const fullName = `${first} ${last}`;
+```
+
+**Excepciones permitidas:**
+- `setState` **asíncrono** (dentro de `await`, `.then()`, `setTimeout`, callbacks de eventos externos) — no dispara la regla.
+- Sincronizar con un sistema externo (red, DOM, librerías de terceros).
+
+#### R2 — Resetear/adjustar estado al cambiar un prop sin effect
+
+Usar el **patrón `prevOpen`** (ajustar durante render) o la prop `key` de React:
+
+```typescript
+// ✅ Permitido: ajustar estado durante el render
+const [prevOpen, setPrevOpen] = useState(open);
+if (open !== prevOpen) {
+  setPrevOpen(open);
+  // ajustar otros estados aquí
+}
+```
+
+#### R3 — Overlays animados (Modal / Drawers) usan `usePresence`
+
+**Prohibido** sincronizar `mounted`/`closing` con `open` mediante `setState` síncrono en un effect. Usar el hook `usePresence` (montaje + animación de salida):
+
+- ✅ Derivar estado durante render con `prevOpen`
+- ✅ `setTimeout` de desmontaje en callbacks (asíncronos)
+- ✅ El `Modal` se desmonta cuando `open` pasa a `false` (no solo por su botón interno de cierre)
+- ❌ Prohibido `setMounted(true)` / `setMounted(false)` síncrono en el `useEffect`
+
+#### R4 — Lógica de eventos va en event handlers, no en effects
+
+Un effect no sabe qué acción del usuario lo disparó. Enviar requests o actualizar estado por una interacción concreta debe ir en el `onClick`/`onSubmit`, no en un `useEffect`.
+
+#### R5 — El `error` de los hooks de borrado debe mostrarse en la UI
+
+Los hooks `useDeleteItem`, `useDeleteCategory`, `useDeleteTransaction` exponen `error` en su estado. **Toda pantalla que elimine datos DEBE:**
+- Pasar `error` al `ConfirmDialog` (prop `error`).
+- **No cerrar** el diálogo si la operación falla (solo cerrar en éxito).
+- Así el usuario ve el motivo del fallo en lugar de que la acción falle en silencio.
+
+### 8.3 Verificación obligatoria antes de merge
+
+| Comando | Resultado esperado |
+|---------|--------------------|
+| `npx tsc --noEmit` | Sin errores de tipos |
+| `npx eslint <archivos>` | Sin errores de `react-hooks/set-state-in-effect` |
+| `npm run lint` | Sin errores |
+| `npm run build` | Build de producción exitoso |
+
+### 8.4 Referencias
+
+- Guía oficial React: [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+- Detalle del patrón y plan de refactor: `tasks.md` → "Deuda técnica: react-hooks/set-state-in-effect"
+- Patrón de overlays y estado: `docs/DESIGN.md` → §1.8
 
 ---
 

@@ -39,8 +39,16 @@ export interface UpdateTransactionDto {
   stockEffect?: StockEffect;
 }
 
+export interface TransactionListFilters {
+  startDate?: string;
+  endDate?: string;
+  categoryId?: string;
+  status?: TransactionStatus;
+  itemId?: string;
+}
+
 export interface ITransactionRepository {
-  list(companyId: string, page?: number, limit?: number): Promise<PaginatedResult<Transaction>>;
+  list(companyId: string, page?: number, limit?: number, filters?: TransactionListFilters): Promise<PaginatedResult<Transaction>>;
   batchCreate(companyId: string, transactions: CreateTransactionDto[]): Promise<Transaction[]>;
   getById(companyId: string, transactionId: string): Promise<Transaction>;
   update(companyId: string, transactionId: string, data: UpdateTransactionDto): Promise<Transaction>;

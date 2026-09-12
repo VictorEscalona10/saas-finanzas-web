@@ -19,29 +19,35 @@ export function useDashboard(companyId: string, month?: string) {
     error: null,
   });
 
-  const fetchDashboard = useCallback(async () => {
-    if (!session || !isAuthenticated) return;
+  const fetchDashboard = useCallback(async (): Promise<DashboardResponse | null> => {
+    if (!session || !isAuthenticated) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new DashboardRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const data = await repo.getDashboard(companyId, month);
-      setState({ data, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar dashboard';
-      setState({ data: null, isLoading: false, error: message });
-    }
+    return repo.getDashboard(companyId, month);
   }, [session, isAuthenticated, companyId, month]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const data = await fetchDashboard();
+        setState({ data, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar dashboard';
+        setState({ data: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, fetchDashboard]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchDashboard();
+      void refetch();
     }
-  }, [sessionLoading, fetchDashboard]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchDashboard };
+  return { ...state, refetch };
 }

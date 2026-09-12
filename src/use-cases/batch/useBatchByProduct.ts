@@ -24,33 +24,41 @@ export function useBatchByProduct(companyId: string | undefined, itemId: string 
   const [page, setPage] = useState(1);
   const limit = 50;
 
-  const fetchBatches = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !itemId) return;
+  const fetchBatches = useCallback(async (): Promise<{ data: ProductionBatch[]; meta: PaginationMeta } | null> => {
+    if (!session || !isAuthenticated || !companyId || !itemId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new ProductionBatchRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const result = await repo.listByProduct(companyId, itemId, page, limit);
-      setState({ batches: result.data, meta: result.meta, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar lotes del producto';
-      setState({ batches: [], meta: null, isLoading: false, error: message });
-    }
+    return repo.listByProduct(companyId, itemId, page, limit);
   }, [session, isAuthenticated, companyId, itemId, page]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !itemId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const result = await fetchBatches();
+        if (!result) return;
+        setState({ batches: result.data, meta: result.meta, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar lotes del producto';
+        setState({ batches: [], meta: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, itemId, fetchBatches]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchBatches();
+      void refetch();
     }
-  }, [sessionLoading, fetchBatches]);
+  }, [sessionLoading, refetch]);
 
   const goToPage = useCallback((newPage: number) => {
     setPage(newPage);
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
   }, []);
 
-  return { ...state, page, limit, refetch: fetchBatches, goToPage };
+  return { ...state, page, limit, refetch, goToPage };
 }

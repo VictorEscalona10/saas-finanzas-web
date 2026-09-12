@@ -5,6 +5,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import Header from '@/src/components/layout/Header';
+import ChatWidget from '@/src/components/finance-chat/ChatWidget';
 import { useCompany } from '@/src/use-cases/company/useCompany';
 import { useMyCompanies } from '@/src/use-cases/company/useMyCompanies';
 import { DollarRateProvider, useDollarRateContext } from '@/src/shared/contexts/DollarRateContext';
@@ -17,20 +18,20 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-  { label: 'Categories', href: '/categories', icon: 'category' },
-  { label: 'Items', href: '/items', icon: 'inventory_2' },
-  { label: 'Transactions', href: '/transactions', icon: 'receipt_long' },
-  { label: 'Production Batches', href: '/batches', icon: 'precision_manufacturing' },
-  { label: 'Cash Flow', href: '/cash-flow', icon: 'payments' },
-  { label: 'Contribution Margin', href: '/contribution-margin', icon: 'analytics' },
-  { label: 'Break-even Point', href: '/balance-point', icon: 'show_chart' },
-  { label: 'Gross Profit', href: '/gross-profit', icon: 'trending_up' },
-  { label: 'Net Profit / P&L', href: '/net-profit', icon: 'account_balance' },
-  { label: 'Unit Cost', href: '/unit-cost', icon: 'request_quote' },
-  { label: 'Price with Margin', href: '/price-margin', icon: 'sell' },
-  { label: 'AI Financial Chat', href: '/finance-chat', icon: 'smart_toy' },
+  { label: 'Panel', href: '/dashboard', icon: 'dashboard' },
+  { label: 'Categorías', href: '/categories', icon: 'category' },
+  { label: 'Productos y Servicios', href: '/items', icon: 'inventory_2' },
+  { label: 'Transacciones', href: '/transactions', icon: 'receipt_long' },
+  { label: 'Lotes de Producción', href: '/batches', icon: 'precision_manufacturing' },
+  { label: 'Flujo de Caja', href: '/cash-flow', icon: 'payments' },
+  { label: 'Margen de Contribución', href: '/contribution-margin', icon: 'analytics' },
+  { label: 'Punto de Equilibrio', href: '/balance-point', icon: 'show_chart' },
+  { label: 'Utilidad Bruta', href: '/gross-profit', icon: 'trending_up' },
+  { label: 'Utilidad Neta', href: '/net-profit', icon: 'account_balance' },
+  { label: 'Costo Unitario', href: '/unit-cost', icon: 'request_quote' },
+  // { label: 'Precio con Margen', href: '/price-margin', icon: 'sell' },
   { label: 'Tasa del Dólar', href: '/dollar-rate', icon: 'currency_exchange' },
+  { label: 'Hoja de Cálculo', href: '/excel', icon: 'grid_on' },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -40,18 +41,33 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const companyId = params.companyId as string;
   const hasCompany = !!companyId;
 
+  const segments = pathname.split('/');
+  const excelIndex = segments.findIndex((segment) => segment === 'excel');
+  const isExcelEditor =
+    excelIndex > 0 && excelIndex === segments.length - 2;
+
+  const isTransactionForm =
+    pathname.includes('/transactions/new') ||
+    /\/transactions\/[^/]+\/edit/.test(pathname);
+
+  const isFullPage = isExcelEditor || isTransactionForm;
+
   const { company } = useCompany(companyId);
   const { companies } = useMyCompanies();
 
   const sidebarRef = useRef<HTMLElement>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const companyRef = useRef<HTMLDivElement>(null);
 
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setSidebarOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     const el = sidebarRef.current;
@@ -65,43 +81,75 @@ export default function AppShell({ children }: { children: ReactNode }) {
     return () => el.removeEventListener('mousemove', handler);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (companyRef.current && !companyRef.current.contains(e.target as Node)) {
+        setCompanyOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const handleCompanySwitch = (id: string) => {
     router.push(`/${id}/dashboard`);
   };
 
+  const handleBack = () => {
+    router.push(`/${companyId}/excel`);
+  };
+
   return (
     <DollarRateProvider companyId={companyId}>
-      <div className="app-shell">
+      <div className={isFullPage ? 'app-shell app-shell--editor' : 'app-shell'}>
         <Header
           onToggleSidebar={toggleSidebar}
+          editorMode={isFullPage}
+          onBack={handleBack}
           companyId={companyId}
           companyName={company?.name}
           companies={companies}
           onCompanySwitch={handleCompanySwitch}
         />
         <div className="app-shell__body">
-          {sidebarOpen && <div className="app-shell__backdrop" onClick={closeSidebar} />}
-          {hasCompany && (
+          {!isFullPage && sidebarOpen && <div className="app-shell__backdrop" onClick={closeSidebar} />}
+          {hasCompany && !isFullPage && (
             <aside
               className={`app-shell__sidebar${sidebarOpen ? ' app-shell__sidebar--open' : ''}`}
               ref={sidebarRef}
             >
               <div className="app-shell__sidebar-header">
-                <div className="app-shell__sidebar-brand">
-                  <span className="app-shell__sidebar-brand-icon material-symbols-outlined">shield</span>
-                  <div>
-                    <div className="app-shell__sidebar-title">V-Vault</div>
-                    <div className="app-shell__sidebar-subtitle">Institutional Modernism</div>
-                  </div>
-                </div>
+                <h2 className="app-shell__sidebar-title">{company?.name}</h2>
               </div>
+
+              <SidebarUtils
+                companyId={companyId}
+                companyName={company?.name}
+                companies={companies}
+                onCompanySwitch={handleCompanySwitch}
+                companyOpen={companyOpen}
+                setCompanyOpen={setCompanyOpen}
+                companyRef={companyRef}
+              />
 
               <nav className="app-shell__sidebar-nav">
                 <NavItems companyId={companyId} />
               </nav>
+
+              <div className="app-shell__sidebar-footer">
+                <button className="app-shell__sidebar-utils-btn" type="button">
+                  <span className="material-symbols-outlined app-shell__sidebar-utils-icon">support</span>
+                  <span className="app-shell__sidebar-utils-label">Soporte</span>
+                </button>
+                <button className="app-shell__sidebar-utils-btn" type="button">
+                  <span className="material-symbols-outlined app-shell__sidebar-utils-icon">rate_review</span>
+                  <span className="app-shell__sidebar-utils-label">Mejorar</span>
+                </button>
+              </div>
             </aside>
           )}
           <main className="app-shell__content">{children}</main>
+          {hasCompany && !isFullPage && <ChatWidget companyId={companyId} />}
         </div>
       </div>
     </DollarRateProvider>
@@ -135,4 +183,79 @@ function NavItems({ companyId }: { companyId: string }) {
       )}
     </Link>
   ));
+}
+
+interface SidebarUtilsProps {
+  companyId: string;
+  companyName?: string;
+  companies: { id: string; name: string }[];
+  onCompanySwitch: (id: string) => void;
+  companyOpen: boolean;
+  setCompanyOpen: (open: boolean) => void;
+  companyRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function SidebarUtils({
+  companyId,
+  companyName,
+  companies,
+  onCompanySwitch,
+  companyOpen,
+  setCompanyOpen,
+  companyRef,
+}: SidebarUtilsProps) {
+  const { dollarRate, isLoading: rateLoading, source } = useDollarRateContext();
+
+  return (
+    <div className="app-shell__sidebar-utils">
+      <div className="app-shell__sidebar-utils-item" ref={companyRef}>
+        <button
+          className="app-shell__sidebar-utils-btn"
+          onClick={() => setCompanyOpen(!companyOpen)}
+        >
+          <span className="material-symbols-outlined app-shell__sidebar-utils-icon">business</span>
+          <span className="app-shell__sidebar-utils-label">{companyName || 'Cargando...'}</span>
+          <span className="material-symbols-outlined app-shell__sidebar-utils-chevron">
+            {companyOpen ? 'expand_less' : 'expand_more'}
+          </span>
+        </button>
+        {companyOpen && (
+          <div className="app-shell__sidebar-utils-dropdown">
+            {companies.map((c) => (
+              <button
+                key={c.id}
+                className={`app-shell__sidebar-utils-dropdown-item${c.id === companyId ? ' app-shell__sidebar-utils-dropdown-item--active' : ''}`}
+                onClick={() => {
+                  setCompanyOpen(false);
+                  onCompanySwitch(c.id);
+                }}
+              >
+                {c.name}
+              </button>
+            ))}
+            <div className="app-shell__sidebar-utils-divider" />
+            <Link
+              href={`/companies?selected=${companyId}`}
+              className="app-shell__sidebar-utils-dropdown-item app-shell__sidebar-utils-dropdown-item--config"
+              onClick={() => setCompanyOpen(false)}
+            >
+              <span className="material-symbols-outlined app-shell__sidebar-utils-dropdown-item-icon">settings</span>
+              Configurar
+            </Link>
+          </div>
+        )}
+      </div>
+
+      <div className={`app-shell__sidebar-utils-item app-shell__sidebar-utils-rate${source === 'manual' ? ' app-shell__sidebar-utils-rate--manual' : ''}`}>
+        <span className="material-symbols-outlined app-shell__sidebar-utils-icon">
+          {source === 'manual' ? 'edit_note' : 'currency_exchange'}
+        </span>
+        <span className="app-shell__sidebar-utils-rate-label">USD/VES</span>
+        <span className="app-shell__sidebar-utils-rate-value">
+          {rateLoading ? '...' : dollarRate?.promedio?.toFixed(2) ?? '—'}
+        </span>
+      </div>
+
+    </div>
+  );
 }

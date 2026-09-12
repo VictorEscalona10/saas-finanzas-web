@@ -1,0 +1,277 @@
+.excel-screen {
+  max-width: 1440px;
+  margin: 0 auto;
+  animation: excel-screen-fadein 0.3s ease;
+}
+
+@keyframes excel-screen-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.excel-screen__header {
+  margin-bottom: 1.25rem;
+}
+
+.excel-screen__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #38debb;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.excel-screen__subtitle {
+  font-size: 0.875rem;
+  color: rgba(186, 202, 195, 0.6);
+  margin: 0.25rem 0 0;
+}
+
+.excel-screen__toolbar {
+  margin-bottom: 0.75rem;
+}
+
+.excel-screen__sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.excel-screen__sheet-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid rgba(56, 222, 187, 0.18);
+  border-radius: 8px;
+  background: rgba(56, 222, 187, 0.05);
+  color: rgba(214, 227, 255, 0.7);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.excel-screen__sheet-tab:hover {
+  background: rgba(56, 222, 187, 0.1);
+  color: #38debb;
+}
+
+.excel-screen__sheet-tab--active {
+  background: rgba(56, 222, 187, 0.15);
+  border-color: rgba(56, 222, 187, 0.5);
+  color: #38debb;
+}
+
+.excel-screen__sheet-tab-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.excel-screen__imports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.excel-screen__import-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(56, 222, 187, 0.18);
+  border-radius: 8px;
+  background: rgba(56, 222, 187, 0.06);
+  color: rgba(214, 227, 255, 0.85);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.excel-screen__import-btn:hover:not(:disabled) {
+  background: rgba(56, 222, 187, 0.14);
+  border-color: rgba(56, 222, 187, 0.45);
+  color: #38debb;
+}
+
+.excel-screen__import-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.excel-screen__import-btn--error {
+  border-color: rgba(255, 107, 129, 0.4);
+  color: #ff7588;
+}
+
+.excel-screen__import-btn--error:hover:not(:disabled) {
+  background: rgba(255, 107, 129, 0.12);
+  border-color: rgba(255, 107, 129, 0.6);
+  color: #ff7588;
+}
+
+.excel-screen__import-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.excel-screen__formula {
+  margin-bottom: 0.75rem;
+}
+
+.excel-screen__empty {
+  padding: 3rem 1rem;
+  color: rgba(186, 202, 195, 0.4);
+  font-size: 0.875rem;
+}
+
+.excel-screen__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 0.75rem;
+  background: rgba(56, 222, 187, 0.03);
+  border: 1px solid rgba(56, 222, 187, 0.12);
+  border-radius: 10px;
+}
+
+.excel-screen__quick-ranges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.excel-screen__quick-btn {
+  padding: 4px 10px;
+  border: 1px solid rgba(56, 222, 187, 0.15);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(214, 227, 255, 0.65);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.excel-screen__quick-btn:hover {
+  background: rgba(56, 222, 187, 0.08);
+  color: #38debb;
+}
+
+.excel-screen__quick-btn--active {
+  background: rgba(56, 222, 187, 0.15);
+  border-color: rgba(56, 222, 187, 0.45);
+  color: #38debb;
+}
+
+.excel-screen__date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.excel-screen__date-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.excel-screen__date-input {
+  padding: 4px 8px;
+  border: 1px solid rgba(56, 222, 187, 0.18);
+  border-radius: 6px;
+  background: rgba(4, 19, 41, 0.6);
+  color: #d6e3ff;
+  font-family: inherit;
+  font-size: 0.8125rem;
+}
+
+.excel-screen__date-input:focus {
+  outline: none;
+  border-color: rgba(56, 222, 187, 0.5);
+}
+
+.excel-screen__apply-btn {
+  padding: 5px 14px;
+  border: 1px solid rgba(56, 222, 187, 0.3);
+  border-radius: 6px;
+  background: rgba(56, 222, 187, 0.1);
+  color: #38debb;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.excel-screen__apply-btn:hover {
+  background: rgba(56, 222, 187, 0.2);
+  border-color: rgba(56, 222, 187, 0.5);
+}
+
+.excel-screen__imports {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 0.75rem;
+}
+
+.excel-screen__import-group {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.excel-screen__import-group-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(186, 202, 195, 0.45);
+  margin-bottom: 8px;
+}
+
+.excel-screen__import-group-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.excel-screen__item-select {
+  padding: 5px 10px;
+  border: 1px solid rgba(56, 222, 187, 0.18);
+  border-radius: 8px;
+  background: rgba(4, 19, 41, 0.6);
+  color: #d6e3ff;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.excel-screen__item-select:focus {
+  outline: none;
+  border-color: rgba(56, 222, 187, 0.5);
+}
+
+.excel-screen__item-select option {
+  background: #0a1a2e;
+  color: #d6e3ff;
+}

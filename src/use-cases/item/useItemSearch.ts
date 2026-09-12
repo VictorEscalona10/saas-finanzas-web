@@ -74,5 +74,65 @@ export function useItemSearch() {
     }
   }, [session, isAuthenticated]);
 
-  return { searchItem, listItems, ...state };
+  const listProducts = useCallback(async (companyId: string): Promise<FuzzySearchResult<Item> | null> => {
+    if (!session || !isAuthenticated) {
+      setState({ result: null, loading: false, error: 'No autenticado' });
+      return null;
+    }
+
+    const token = (session as { access_token: string }).access_token;
+    const repo = new ItemRepositoryImpl(token);
+
+    setState({ result: null, loading: true, error: null });
+
+    try {
+      const paginated = await repo.listProducts(companyId, 1, 200);
+      const result: FuzzySearchResult<Item> = {
+        success: true,
+        dataSource: 'prisma',
+        searchTerm: '',
+        count: paginated.data.length,
+        items: paginated.data,
+      };
+      setState({ result, loading: false, error: null });
+      return result;
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al listar productos';
+      setState({ result: null, loading: false, error: message });
+      return null;
+    }
+  }, [session, isAuthenticated]);
+
+  const listServices = useCallback(async (companyId: string): Promise<FuzzySearchResult<Item> | null> => {
+    if (!session || !isAuthenticated) {
+      setState({ result: null, loading: false, error: 'No autenticado' });
+      return null;
+    }
+
+    const token = (session as { access_token: string }).access_token;
+    const repo = new ItemRepositoryImpl(token);
+
+    setState({ result: null, loading: true, error: null });
+
+    try {
+      const paginated = await repo.listServices(companyId, 1, 200);
+      const result: FuzzySearchResult<Item> = {
+        success: true,
+        dataSource: 'prisma',
+        searchTerm: '',
+        count: paginated.data.length,
+        items: paginated.data,
+      };
+      setState({ result, loading: false, error: null });
+      return result;
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al listar servicios';
+      setState({ result: null, loading: false, error: message });
+      return null;
+    }
+  }, [session, isAuthenticated]);
+
+  return { searchItem, listItems, listProducts, listServices, ...state };
 }

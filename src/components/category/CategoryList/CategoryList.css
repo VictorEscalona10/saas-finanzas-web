@@ -277,6 +277,24 @@
   border-color: rgba(0, 228, 121, 0.3);
 }
 
+.category-list__badge--product {
+  background: rgba(0, 113, 201, 0.2);
+  color: #82b1ff;
+  border-color: rgba(0, 113, 201, 0.3);
+}
+
+.category-list__badge--service {
+  background: rgba(0, 228, 121, 0.15);
+  color: #00ff88;
+  border-color: rgba(0, 228, 121, 0.3);
+}
+
+.category-list__badge--none {
+  background: rgba(185, 203, 185, 0.15);
+  color: #b9cbb9;
+  border-color: rgba(185, 203, 185, 0.3);
+}
+
 .category-list__loading-row {
   opacity: 0.5;
 }

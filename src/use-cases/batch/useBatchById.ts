@@ -19,29 +19,35 @@ export function useBatchById(companyId: string | undefined, batchId: string | un
     error: null,
   });
 
-  const fetchBatch = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !batchId) return;
+  const fetchBatch = useCallback(async (): Promise<ProductionBatch | null> => {
+    if (!session || !isAuthenticated || !companyId || !batchId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new ProductionBatchRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const result = await repo.getById(companyId, batchId);
-      setState({ batch: result, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar el lote';
-      setState({ batch: null, isLoading: false, error: message });
-    }
+    return repo.getById(companyId, batchId);
   }, [session, isAuthenticated, companyId, batchId]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !batchId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const result = await fetchBatch();
+        setState({ batch: result, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar el lote';
+        setState({ batch: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, batchId, fetchBatch]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchBatch();
+      void refetch();
     }
-  }, [sessionLoading, fetchBatch]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchBatch };
+  return { ...state, refetch };
 }

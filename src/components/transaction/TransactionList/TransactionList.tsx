@@ -1,30 +1,22 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useTransactionList } from '@/src/use-cases/transaction/useTransactionList';
 import type { Transaction } from '@/src/domain/entities/Transaction';
+import type { TransactionListFilters } from '@/src/domain/repositories/ITransactionRepository';
+import type { TransactionFiltersState } from '@/src/components/transaction/TransactionFilters/TransactionFilters';
 import { PAYMENT_METHODS } from '@/src/shared/constants';
 import Button from '@/src/components/shared/Button';
+import Badge from '@/src/components/shared/Badge';
+import Pagination from '@/src/components/shared/Pagination';
 import Skeleton from '@/src/components/shared/Skeleton';
 import './TransactionList.css';
 
 interface TransactionListProps {
   companyId: string;
+  filters?: TransactionFiltersState;
   onNew?: () => void;
   onView?: (transaction: Transaction) => void;
-}
-
-function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  const pages: (number | 'ellipsis')[] = [1];
-  if (current > 3) pages.push('ellipsis');
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
-  for (let i = start; i <= end; i++) pages.push(i);
-  if (current < total - 2) pages.push('ellipsis');
-  pages.push(total);
-  return pages;
 }
 
 function formatDate(dateStr: string): string {
@@ -47,14 +39,98 @@ function getPaymentMethodLabel(method: string): string {
   return (PAYMENT_METHODS as Record<string, string>)[method] ?? method;
 }
 
+function TransactionCard({ transaction, onView }: { transaction: Transaction; onView?: (t: Transaction) => void }) {
+  const isInflow = transaction.category.flowDirection !== 'OUTFLOW';
+  return (
+    <div className="transaction-list__card" onClick={() => onView?.(transaction)}>
+      <div className="transaction-list__card-header">
+        <Badge variant={isInflow ? 'success' : 'danger'} size="sm" dot>
+          {isInflow ? '↑ Ingreso' : '↓ Egreso'}
+        </Badge>
+        <span className="transaction-list__card-date">
+          {formatDate(transaction.paymentDate ?? transaction.createdAt)}
+        </span>
+      </div>
 
-export default function TransactionList({ companyId, onNew, onView }: TransactionListProps) {
-  const { transactions, meta, isLoading, error, page, refetch, goToPage } = useTransactionList(companyId);
-  
-  const total = meta?.total ?? 0;
-  const totalPages = meta?.totalPages ?? 0;
-  
-  console.log('TransactionList component loaded', transactions);
+      <div className="transaction-list__card-body">
+        <span className="transaction-list__card-category">{transaction.category.name}</span>
+        <span className="transaction-list__card-item">
+          {transaction.costItem?.name ?? transaction.item?.name ?? '—'}
+        </span>
+      </div>
+
+      <div className="transaction-list__card-amounts">
+        <div className="transaction-list__card-amount transaction-list__card-amount--usd">
+          <span className="transaction-list__card-amount-label">USD</span>
+          {transaction.amountUSD != null ? (
+            <span className="transaction-list__card-amount-value">{formatUSD(transaction.amountUSD)}</span>
+          ) : (
+            <span className="transaction-list__card-empty-amount">—</span>
+          )}
+        </div>
+        <div className="transaction-list__card-amount transaction-list__card-amount--bs">
+          <span className="transaction-list__card-amount-label">Bs</span>
+          {transaction.amountBs != null ? (
+            <span className="transaction-list__card-amount-value">{formatBs(transaction.amountBs)}</span>
+          ) : (
+            <span className="transaction-list__card-empty-amount">—</span>
+          )}
+        </div>
+      </div>
+
+      <div className="transaction-list__card-footer">
+        <span className="transaction-list__card-method">
+          {getPaymentMethodLabel(transaction.paymentMethod)}
+        </span>
+        <Badge
+          variant={transaction.status === 'COMPLETED' ? 'success' : 'warning'}
+          size="sm"
+        >
+          {transaction.status === 'COMPLETED' ? 'Completado' : 'Pendiente'}
+        </Badge>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div className="transaction-list__skeleton-card">
+      <div className="transaction-list__skeleton-header">
+        <Skeleton variant="text" />
+        <Skeleton variant="text" />
+      </div>
+      <div>
+        <Skeleton variant="text" />
+        <Skeleton variant="text" />
+      </div>
+      <div className="transaction-list__skeleton-amounts">
+        <Skeleton variant="card" />
+        <Skeleton variant="card" />
+      </div>
+      <div className="transaction-list__skeleton-footer">
+        <Skeleton variant="text" />
+        <Skeleton variant="text" />
+      </div>
+    </div>
+  );
+}
+
+export default function TransactionList({ companyId, filters, onNew, onView }: TransactionListProps) {
+  const listFilters = useMemo<TransactionListFilters | undefined>(
+    () =>
+      filters
+        ? {
+            startDate: filters.startDate || undefined,
+            endDate: filters.endDate || undefined,
+            categoryId: filters.categoryId ?? undefined,
+            status: filters.status === 'all' ? undefined : filters.status,
+          }
+        : undefined,
+    [filters]
+  );
+  const { transactions, meta, isLoading, error, page, refetch, goToPage } = useTransactionList(companyId, listFilters);
+
   return (
     <div className="transaction-list">
       <div className="transaction-list__header">
@@ -78,141 +154,46 @@ export default function TransactionList({ companyId, onNew, onView }: Transactio
         </div>
       )}
 
-      <div className="transaction-list__table-container">
-        {isLoading ? (
-          <table className="transaction-list__table">
-            <thead>
-              <tr>
-                <th className="transaction-list__th">Fecha</th>
-                <th className="transaction-list__th">Categoría</th>
-                <th className="transaction-list__th">Item</th>
-                <th className="transaction-list__th">Tipo</th>
-                <th className="transaction-list__th transaction-list__th--right">Monto USD</th>
-                <th className="transaction-list__th transaction-list__th--right">Monto Bs</th>
-                <th className="transaction-list__th">Método</th>
-                <th className="transaction-list__th">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="transaction-list__loading-row">
-                  {Array.from({ length: 8 }).map((__, j) => (
-                    <td key={j} className="transaction-list__td">
-                      <Skeleton variant="text" />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : transactions.length === 0 ? (
-          <div className="transaction-list__empty">
-            <div className="transaction-list__empty-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: '4rem' }}>receipt_long</span>
-            </div>
-            <h2 className="transaction-list__empty-title">No hay transacciones aún</h2>
-            <p className="transaction-list__empty-text">
-              Comienza registrando tu primera transacción financiera.
-            </p>
-            <Button variant="primary" size="lg" onClick={onNew}>
-              Crear primera transacción
-            </Button>
+      {isLoading ? (
+        <div className="transaction-list__skeleton-grid">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : transactions.length === 0 ? (
+        <div className="transaction-list__empty">
+          <div className="transaction-list__empty-icon">
+            <span className="material-symbols-outlined" style={{ fontSize: '4rem' }}>receipt_long</span>
           </div>
-        ) : (
-          <>
-            <div className="transaction-list__table-scroll">
-              <table className="transaction-list__table">
-                <thead>
-                  <tr>
-                    <th className="transaction-list__th">Fecha</th>
-                    <th className="transaction-list__th">Categoría</th>
-                    <th className="transaction-list__th">Item</th>
-                    <th className="transaction-list__th">Tipo</th>
-                    <th className="transaction-list__th transaction-list__th--right">Monto USD</th>
-                    <th className="transaction-list__th transaction-list__th--right">Monto Bs</th>
-                    <th className="transaction-list__th">Método</th>
-                    <th className="transaction-list__th">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((t) => (
-                    <tr key={t.id} className="transaction-list__row" onClick={() => onView?.(t)}>
-                      <td className="transaction-list__td transaction-list__td--date">
-                        {formatDate(t.paymentDate ?? t.createdAt)}
-                      </td>
-                      <td className="transaction-list__td transaction-list__td--category">
-                        <span className="transaction-list__category-name">{t.category.name}</span>
-                      </td>
-                      <td className="transaction-list__td transaction-list__td--item">
-                        {t.costItem?.name ?? t.item?.name ?? <span className="transaction-list__empty-value">&mdash;</span>}
-                      </td>
-                      <td className="transaction-list__td">
-                        <span className={`transaction-list__badge transaction-list__badge--flow transaction-list__badge--${t.category.flowDirection?.toLowerCase() ?? 'inflow'}`}>
-                          {t.category.flowDirection === 'OUTFLOW' ? '↓ Egreso' : '↑ Ingreso'}
-                        </span>
-                      </td>
-                      <td className="transaction-list__td transaction-list__td--right transaction-list__td--amount">
-                        {t.amountUSD != null ? formatUSD(t.amountUSD) : <span className="transaction-list__empty-value">&mdash;</span>}
-                      </td>
-                      <td className="transaction-list__td transaction-list__td--right transaction-list__td--amount">
-                        {t.amountBs != null ? formatBs(t.amountBs) : <span className="transaction-list__empty-value">&mdash;</span>}
-                      </td>
-                      <td className="transaction-list__td transaction-list__td--method">
-                        {getPaymentMethodLabel(t.paymentMethod)}
-                      </td>
-                      <td className="transaction-list__td">
-                        <span className={`transaction-list__badge transaction-list__badge--${t.status.toLowerCase()}`}>
-                          {t.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <h2 className="transaction-list__empty-title">No hay transacciones aún</h2>
+          <p className="transaction-list__empty-text">
+            Comienza registrando tu primera transacción financiera.
+          </p>
+          <Button variant="primary" size="lg" onClick={onNew}>
+            Crear primera transacción
+          </Button>
+        </div>
+      ) : (
+        <>
+          <div className="transaction-list__grid">
+            {transactions.map((t) => (
+              <TransactionCard key={t.id} transaction={t} onView={onView} />
+            ))}
+          </div>
 
-            {meta && totalPages > 0 && (
-              <div className="transaction-list__pagination">
-                <span className="transaction-list__pagination-info">
-                  Mostrando <strong>{(page - 1) * meta.limit + 1}-{Math.min(page * meta.limit, meta.total)}</strong> de{' '}
-                  <strong>{meta.total}</strong> registros
-                </span>
-                <div className="transaction-list__pagination-controls">
-                  <button
-                    className="transaction-list__page-btn"
-                    disabled={page <= 1}
-                    onClick={() => goToPage(page - 1)}
-                    aria-label="Anterior"
-                  >
-                    <span className="material-symbols-outlined">chevron_left</span>
-                  </button>
-                  {getPageNumbers(page, totalPages).map((p, i) =>
-                    p === 'ellipsis' ? (
-                      <span key={`ellipsis-${i}`} className="transaction-list__page-ellipsis">...</span>
-                    ) : (
-                      <button
-                        key={p}
-                        className={`transaction-list__page-btn${p === page ? ' transaction-list__page-btn--active' : ''}`}
-                        onClick={() => goToPage(p)}
-                      >
-                        {p}
-                      </button>
-                    )
-                  )}
-                  <button
-                    className="transaction-list__page-btn"
-                    disabled={page >= totalPages}
-                    onClick={() => goToPage(page + 1)}
-                    aria-label="Siguiente"
-                  >
-                    <span className="material-symbols-outlined">chevron_right</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          {meta && meta.totalPages > 0 && (
+            <div className="transaction-list__pagination-wrapper">
+              <Pagination
+                page={page}
+                totalPages={meta.totalPages}
+                total={meta.total}
+                limit={meta.limit}
+                onPageChange={goToPage}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

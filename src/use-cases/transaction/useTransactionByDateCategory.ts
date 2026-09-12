@@ -19,29 +19,35 @@ export function useTransactionByDateCategory(companyId: string | undefined, cate
     error: null,
   });
 
-  const fetchTransactions = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !categoryId) return;
+  const fetchTransactions = useCallback(async (): Promise<Transaction[]> => {
+    if (!session || !isAuthenticated || !companyId || !categoryId) return [];
 
     const token = (session as { access_token: string }).access_token;
     const repo = new TransactionRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const transactions = await repo.getByDateCategory(companyId, categoryId);
-      setState({ transactions, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar transacciones por categoría';
-      setState({ transactions: [], isLoading: false, error: message });
-    }
+    return repo.getByDateCategory(companyId, categoryId);
   }, [session, isAuthenticated, companyId, categoryId]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !categoryId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const transactions = await fetchTransactions();
+        setState({ transactions, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar transacciones por categoría';
+        setState({ transactions: [], isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, categoryId, fetchTransactions]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchTransactions();
+      void refetch();
     }
-  }, [sessionLoading, fetchTransactions]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchTransactions };
+  return { ...state, refetch };
 }

@@ -27,6 +27,167 @@
   margin: 0;
 }
 
+.batch-list__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.batch-list__filter {
+  position: relative;
+  min-width: 16rem;
+  max-width: 24rem;
+  flex: 1;
+}
+
+.batch-list__filter-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.batch-list__filter-input-wrapper:focus-within {
+  border-color: #00ff88;
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1);
+}
+
+.batch-list__filter-icon {
+  color: rgba(185, 203, 185, 0.6);
+  font-size: 1.25rem;
+  margin-left: 0.875rem;
+  flex-shrink: 0;
+}
+
+.batch-list__filter-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: #dae6d8;
+  outline: none;
+  min-width: 0;
+}
+
+.batch-list__filter-input::placeholder {
+  color: rgba(185, 203, 185, 0.4);
+}
+
+.batch-list__filter-clear {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(185, 203, 185, 0.6);
+  cursor: pointer;
+  border-radius: 9999px;
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.batch-list__filter-clear:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.batch-list__filter-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(17, 32, 54, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.batch-list__filter-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.batch-list__filter-skeleton {
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  animation: batch-list-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes batch-list-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.batch-list__filter-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  color: rgba(185, 203, 185, 0.6);
+  font-size: 0.875rem;
+}
+
+.batch-list__filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.batch-list__filter-option:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.batch-list__filter-option-name {
+  font-weight: 500;
+}
+
+.batch-list__filter-option-type {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #b9cbb9;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.batch-list__filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 9999px;
+  color: #b9cbb9;
+  font-size: 0.875rem;
+}
+
+.batch-list__filter-badge strong {
+  color: #00ff88;
+  font-weight: 600;
+}
+
 .batch-list__error {
   display: flex;
   align-items: center;
@@ -262,6 +423,11 @@
 @media (max-width: 768px) {
   .batch-list__header {
     flex-direction: column;
+  }
+
+  .batch-list__filter {
+    min-width: 100%;
+    max-width: none;
   }
 
   .batch-list__pagination {

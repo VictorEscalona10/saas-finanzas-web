@@ -3,8 +3,9 @@
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateBatch } from '@/src/use-cases/batch/useCreateBatch';
+import { useUpdateBatch } from '@/src/use-cases/batch/useUpdateBatch';
 import { useItemSearch } from '@/src/use-cases/item/useItemSearch';
-import type { BatchStatus } from '@/src/domain/entities/ProductionBatch';
+import type { BatchStatus, ProductionBatch } from '@/src/domain/entities/ProductionBatch';
 import type { Item } from '@/src/domain/entities/Item';
 import Button from '@/src/components/shared/Button';
 import './BatchForm.css';
@@ -12,24 +13,46 @@ import './BatchForm.css';
 interface BatchFormProps {
   companyId: string;
   onCancel: () => void;
+  batch?: ProductionBatch;
+  onSave?: () => void;
   id?: string;
   hideFooter?: boolean;
   onLoadingChange?: (loading: boolean) => void;
 }
 
-export default function BatchForm({ companyId, onCancel, id, hideFooter, onLoadingChange }: BatchFormProps) {
+function getInitialDate(batch?: ProductionBatch): string {
+  if (batch?.batchDate) return batch.batchDate.split('T')[0];
+  return new Date().toISOString().split('T')[0];
+}
+
+function getInitialItem(batch?: ProductionBatch): Item | null {
+  if (!batch?.item) return null;
+  return {
+    id: batch.item.id,
+    name: batch.item.name,
+    type: batch.item.type as Item['type'],
+    companyId: '',
+    basePrice: 0,
+    stockCurrent: 0,
+    isRemoved: false,
+  };
+}
+
+export default function BatchForm({ companyId, onCancel, batch, onSave, id, hideFooter, onLoadingChange }: BatchFormProps) {
   const router = useRouter();
-  const { createBatch, loading } = useCreateBatch();
+  const { createBatch, loading: creating } = useCreateBatch();
+  const { updateBatch, loading: updating } = useUpdateBatch();
   const { searchItem, listItems, result: itemResult, loading: searchingItem } = useItemSearch();
 
-  const [itemQuery, setItemQuery] = useState('');
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const loading = creating || updating;
+  const [itemQuery, setItemQuery] = useState(() => batch?.item?.name ?? '');
+  const [selectedItem, setSelectedItem] = useState<Item | null>(() => getInitialItem(batch));
   const [itemOpen, setItemOpen] = useState(false);
   const [allItems, setAllItems] = useState<Item[]>([]);
   const [allItemsLoading, setAllItemsLoading] = useState(false);
-  const [quantity, setQuantity] = useState('');
-  const [status, setStatus] = useState<BatchStatus>('OPEN');
-  const [batchDate, setBatchDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [quantity, setQuantity] = useState(() => (batch?.quantity != null ? String(batch.quantity) : ''));
+  const [status, setStatus] = useState<BatchStatus>(batch?.status ?? 'OPEN');
+  const [batchDate, setBatchDate] = useState(() => getInitialDate(batch));
   const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemContainerRef = useRef<HTMLDivElement>(null);
@@ -110,18 +133,30 @@ export default function BatchForm({ companyId, onCancel, id, hideFooter, onLoadi
       return;
     }
 
-    const batch = await createBatch(companyId, selectedItem.id, {
+    const dto = {
       quantity: quantity ? parseInt(quantity, 10) : undefined,
       status,
       batchDate: batchDate || undefined,
-    });
+    };
 
     if (batch) {
-      router.push(`/${companyId}/batches/${batch.id}`);
+      const updated = await updateBatch(companyId, batch.id, dto);
+      if (updated) {
+        onSave?.();
+      } else {
+        setError('Error al actualizar el lote');
+      }
+      return;
+    }
+
+    const created = await createBatch(companyId, selectedItem.id, dto);
+
+    if (created) {
+      router.push(`/${companyId}/batches/${created.id}`);
     } else {
       setError('Error al crear el lote');
     }
-  }, [companyId, selectedItem, quantity, status, batchDate, createBatch, router]);
+  }, [companyId, batch, selectedItem, quantity, status, batchDate, updateBatch, createBatch, onSave, router]);
 
   return (
     <div className="batch-form-wrapper">
@@ -138,8 +173,9 @@ export default function BatchForm({ companyId, onCancel, id, hideFooter, onLoadi
                   value={itemQuery}
                   onChange={(e) => handleItemSearch(e.target.value)}
                   onFocus={openItemDropdown}
+                  disabled={!!batch}
                 />
-                {selectedItem && (
+                {selectedItem && !batch && (
                   <button
                     type="button"
                     className="batch-form__item-clear"
@@ -150,7 +186,7 @@ export default function BatchForm({ companyId, onCancel, id, hideFooter, onLoadi
                   </button>
                 )}
               </div>
-              {itemOpen && (
+              {itemOpen && !batch && (
                 <div className="batch-form__item-dropdown">
                   {isListLoading || isSearchLoading ? (
                     <div className="batch-form__item-dropdown-loading">
@@ -239,7 +275,7 @@ export default function BatchForm({ companyId, onCancel, id, hideFooter, onLoadi
                 Cancelar
               </Button>
               <Button variant="primary" size="lg" fullWidth loading={loading} type="submit">
-                {loading ? 'Guardando...' : 'Guardar'}
+                {loading ? 'Guardando...' : batch ? 'Actualizar' : 'Guardar'}
               </Button>
             </div>
           )}

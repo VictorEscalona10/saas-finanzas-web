@@ -1,0 +1,88 @@
+.excel-cell {
+  position: relative;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  height: 32px;
+  overflow: hidden;
+  cursor: cell;
+  user-select: none;
+  background: rgba(2, 12, 26, 0.45);
+  border-right: 1px solid rgba(56, 222, 187, 0.08);
+  border-bottom: 1px solid rgba(56, 222, 187, 0.08);
+}
+
+.excel-cell--selected {
+  background: rgba(56, 222, 187, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(56, 222, 187, 0.9);
+  z-index: 2;
+}
+
+.excel-cell--range {
+  background: rgba(56, 222, 187, 0.06);
+}
+
+.excel-cell--editing {
+  overflow: visible;
+  z-index: 3;
+  background: rgba(4, 19, 41, 0.98);
+  box-shadow: inset 0 0 0 2px rgba(56, 222, 187, 1);
+}
+
+.excel-cell--error {
+  color: #ff7b8a;
+}
+
+.excel-cell--formula {
+  color: rgba(56, 222, 187, 0.9);
+}
+
+.excel-cell--number,
+.excel-cell--numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+.excel-cell__content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: rgba(186, 202, 195, 0.85);
+}
+
+.excel-cell--left .excel-cell__content {
+  justify-content: flex-start;
+}
+
+.excel-cell--center .excel-cell__content {
+  justify-content: center;
+}
+
+.excel-cell--right .excel-cell__content {
+  justify-content: flex-end;
+}
+
+.excel-cell__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: rgba(4, 19, 41, 0.98);
+  color: #d6e3ff;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  caret-color: #38debb;
+}
+
+.excel-cell__input:focus {
+  outline: none;
+}

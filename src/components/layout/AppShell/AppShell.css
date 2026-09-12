@@ -50,6 +50,13 @@
   font-variation-settings: 'FILL' 1;
 }
 
+.app-shell__sidebar-brand-logo {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
 .app-shell__sidebar-title {
   font-size: 1rem;
   font-weight: 700;
@@ -138,6 +145,10 @@
   min-width: 0;
 }
 
+.app-shell--editor .app-shell__content {
+  padding: 1rem;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -155,7 +166,176 @@
   background: rgba(60, 74, 69, 0.8);
 }
 
+.app-shell__sidebar-utils {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(53, 71, 103, 0.3);
+}
+
+.app-shell__sidebar-utils-item {
+  position: relative;
+}
+
+.app-shell__sidebar-utils-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(186, 202, 195, 0.7);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.app-shell__sidebar-utils-btn:hover {
+  background: rgba(56, 222, 187, 0.06);
+  color: #d6e3ff;
+}
+
+.app-shell__sidebar-utils-icon {
+  font-size: 1.25rem;
+  width: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+  color: #38debb;
+}
+
+.app-shell__sidebar-utils-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-shell__sidebar-utils-chevron {
+  margin-left: auto;
+  font-size: 1rem;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.app-shell__sidebar-utils-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0.5rem;
+  right: 0.5rem;
+  background: rgba(17, 32, 54, 0.98);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(53, 71, 103, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  overflow: hidden;
+  animation: sidebar-dropdown-in 0.12s ease;
+}
+
+@keyframes sidebar-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app-shell__sidebar-utils-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: none;
+  border: none;
+  color: rgba(186, 202, 195, 0.8);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s ease;
+}
+
+.app-shell__sidebar-utils-dropdown-item:hover {
+  background: rgba(56, 222, 187, 0.06);
+  color: #d6e3ff;
+}
+
+.app-shell__sidebar-utils-dropdown-item--active {
+  background: rgba(56, 222, 187, 0.1);
+  color: #38debb;
+  font-weight: 600;
+}
+
+.app-shell__sidebar-utils-dropdown-item--config {
+  color: rgba(186, 202, 195, 0.6);
+  font-size: 0.75rem;
+}
+
+.app-shell__sidebar-utils-dropdown-item--config:hover {
+  color: #d6e3ff;
+}
+
+.app-shell__sidebar-utils-dropdown-item-icon {
+  font-size: 1rem;
+  color: rgba(186, 202, 195, 0.5);
+}
+
+.app-shell__sidebar-utils-rate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(56, 222, 187, 0.06);
+  border: 1px solid rgba(56, 222, 187, 0.12);
+}
+
+.app-shell__sidebar-utils-rate--manual {
+  background: rgba(255, 183, 0, 0.08);
+  border-color: rgba(255, 183, 0, 0.25);
+}
+
+.app-shell__sidebar-utils-rate-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.app-shell__sidebar-utils-rate-value {
+  margin-left: auto;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #38debb;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-shell__sidebar-utils-divider {
+  height: 1px;
+  background: rgba(53, 71, 103, 0.3);
+  margin: 0.25rem 0;
+}
+
+.app-shell__sidebar-footer {
+  margin-top: auto;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(53, 71, 103, 0.3);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
 @media (max-width: 1023px) {
+  .app-shell__sidebar-utils {
+    display: flex;
+  }
+
+  .app-shell__sidebar-footer {
+    display: flex;
+  }
+
   .app-shell__sidebar {
     position: fixed;
     top: 64px;

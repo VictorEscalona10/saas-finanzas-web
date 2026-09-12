@@ -1,0 +1,160 @@
+.excel-projects {
+  max-width: 1440px;
+  margin: 0 auto;
+  animation: excel-projects-fadein 0.3s ease;
+}
+
+@keyframes excel-projects-fadein {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.excel-projects__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.excel-projects__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #38debb;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.excel-projects__subtitle {
+  font-size: 0.875rem;
+  color: rgba(186, 202, 195, 0.6);
+  margin: 0.25rem 0 0;
+}
+
+.excel-projects__create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid rgba(56, 222, 187, 0.4);
+  border-radius: 10px;
+  background: rgba(56, 222, 187, 0.12);
+  color: #38debb;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.excel-projects__create-btn:hover {
+  background: rgba(56, 222, 187, 0.2);
+  border-color: rgba(56, 222, 187, 0.7);
+  transform: translateY(-1px);
+}
+
+.excel-projects__create-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.excel-projects__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.excel-projects__card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem;
+  border: 1px solid rgba(53, 71, 103, 0.45);
+  border-radius: 12px;
+  background: rgba(17, 32, 54, 0.6);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.excel-projects__card:hover {
+  background: rgba(55, 71, 103, 0.5);
+  border-color: rgba(56, 222, 187, 0.4);
+  transform: translateY(-2px);
+}
+
+.excel-projects__card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 10px;
+  background: rgba(56, 222, 187, 0.1);
+  flex-shrink: 0;
+}
+
+.excel-projects__card-icon-symbol {
+  font-size: 1.5rem;
+  color: #38debb;
+  font-variation-settings: 'FILL' 1;
+}
+
+.excel-projects__card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.excel-projects__card-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #d6e3ff;
+  margin: 0 0 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.excel-projects__card-template {
+  font-size: 0.75rem;
+  color: rgba(186, 202, 195, 0.6);
+}
+
+.excel-projects__card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.excel-projects__card-date {
+  font-size: 0.6875rem;
+  color: rgba(186, 202, 195, 0.45);
+}
+
+.excel-projects__card-chevron {
+  font-size: 1rem;
+  color: rgba(56, 222, 187, 0.6);
+}
+
+.excel-projects__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4rem 1rem;
+}
+
+.excel-projects__empty-icon {
+  font-size: 2.5rem;
+  color: rgba(186, 202, 195, 0.3);
+}
+
+.excel-projects__empty-text {
+  font-size: 0.875rem;
+  color: rgba(186, 202, 195, 0.4);
+  margin: 0;
+}

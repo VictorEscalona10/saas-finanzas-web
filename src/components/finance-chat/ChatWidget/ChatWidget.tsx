@@ -25,20 +25,9 @@ function WelcomeMessage() {
   );
 }
 
-function Skeleton() {
-  return (
-    <div className="chat-widget__messages">
-      {[1, 2].map((i) => (
-        <div key={i} className="chat-widget__skeleton-row">
-          <div className="chat-widget__skeleton chat-widget__skeleton--bubble" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function ChatWidget({ companyId }: ChatWidgetProps) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -81,7 +70,7 @@ export default function ChatWidget({ companyId }: ChatWidgetProps) {
       </button>
 
       {open && (
-        <div className="chat-widget__panel">
+        <div className={`chat-widget__panel${expanded ? ' chat-widget__panel--expanded' : ''}`}>
           <div className="chat-widget__header">
             <div className="chat-widget__header-left">
               <span className="chat-widget__header-icon material-symbols-outlined">smart_toy</span>
@@ -97,6 +86,15 @@ export default function ChatWidget({ companyId }: ChatWidgetProps) {
                 title="Limpiar conversación"
               >
                 <span className="material-symbols-outlined">delete</span>
+              </button>
+              <button
+                className="chat-widget__header-btn"
+                onClick={() => setExpanded((prev) => !prev)}
+                title={expanded ? 'Reducir' : 'Ampliar'}
+              >
+                <span className="material-symbols-outlined">
+                  {expanded ? 'close_fullscreen' : 'open_in_full'}
+                </span>
               </button>
               <button
                 className="chat-widget__header-btn"

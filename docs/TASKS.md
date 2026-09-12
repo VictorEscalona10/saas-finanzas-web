@@ -227,11 +227,11 @@
 >
 > **Nota:** `IBalancePointRepository` y tipos de respuesta ya creados en Fase 0.
 
-- [ ] **10.1** Crear `src/infrastructure/repositories/BalancePointRepositoryImpl.ts`
-- [ ] **10.2** Crear `src/use-cases/balance-point/useBalancePoint.ts`
-- [ ] **10.3** Crear `src/components/balance-point/BalancePointCard/` — card con financialsActual + breakEven
-- [ ] **10.4** Crear `src/components/balance-point/BreakEvenChart/` — visualización de distancia al punto de equilibrio
-- [ ] **10.5** Crear `app/(private)/companies/[companyId]/balance-point/page.tsx`
+- [x] **10.1** Crear `src/infrastructure/repositories/BalancePointRepositoryImpl.ts`
+- [x] **10.2** Crear `src/use-cases/balance-point/useBalancePoint.ts`- 
+- [x] **10.3** Crear `src/components/balance-point/BalancePointCard/` — card con financialsActual + breakEven
+- [x] **10.4** ~~Crear `src/components/balance-point/BreakEvenChart/`~~ → descartada: la visualización se eliminó por decisión de diseño (los datos del punto de equilibrio viven en el hero y el resumen financiero de `BalancePointCard`)
+- [x] **10.5** Crear `app/(private)/companies/[companyId]/balance-point/page.tsx`
 
 ---
 
@@ -253,13 +253,13 @@
 
 > Análisis de utilidad bruta (Ventas - COGS).
 
-- [ ] **12.1** Crear `src/infrastructure/repositories/GrossProfitRepositoryImpl.ts`
-- [ ] **12.2** Crear `src/use-cases/gross-profit/useGrossProfitGlobal.ts`
-- [ ] **12.3** Crear `src/use-cases/gross-profit/useGrossProfitProduct.ts`
-- [ ] **12.4** Crear `src/use-cases/gross-profit/useGrossProfitService.ts`
-- [ ] **12.5** Crear `src/components/gross-profit/GrossProfitCard/` — card con totalSales, totalCogs, grossProfit, grossMargin (USD + Bs)
-- [ ] **12.6** Crear `src/components/gross-profit/GrossProfitTable/` — desglose por producto/servicio
-- [ ] **12.7** Crear `app/(private)/companies/[companyId]/gross-profit/page.tsx`
+- [x] **12.1** Crear `src/infrastructure/repositories/GrossProfitRepositoryImpl.ts`
+- [x] **12.2** Crear `src/use-cases/gross-profit/useGrossProfitGlobal.ts`
+- [x] **12.3** Crear `src/use-cases/gross-profit/useGrossProfitProduct.ts`
+- [x] **12.4** Crear `src/use-cases/gross-profit/useGrossProfitService.ts`
+- [x] **12.5** Crear `src/components/gross-profit/GrossProfitCard/` — card con totalSales, totalCogs, grossProfit, grossMargin (USD + Bs)
+- [x] **12.6** Crear `src/components/gross-profit/GrossProfitTable/` — desglose por producto/servicio
+- [x] **12.7** Crear `app/(private)/companies/[companyId]/gross-profit/page.tsx`
 
 ---
 
@@ -267,12 +267,12 @@
 
 > Análisis de utilidad neta y estado de resultados.
 
-- [ ] **13.1** Crear `src/infrastructure/repositories/NetProfitRepositoryImpl.ts`
-- [ ] **13.2** Crear `src/use-cases/net-profit/useNetProfit.ts`
-- [ ] **13.3** Crear `src/use-cases/net-profit/useNetProfitStatement.ts`
-- [ ] **13.4** Crear `src/components/net-profit/NetProfitCard/` — card con grossProfit, operatingExpenses, netProfit, netMargin
-- [ ] **13.5** Crear `src/components/net-profit/ProfitLossStatement/` — P&L estructurado por CategoryType
-- [ ] **13.6** Crear `app/(private)/companies/[companyId]/net-profit/page.tsx`
+- [x] **13.1** Crear `src/infrastructure/repositories/NetProfitRepositoryImpl.ts`
+- [x] **13.2** Crear `src/use-cases/net-profit/useNetProfit.ts``
+- [x] **13.3** Crear `src/use-cases/net-profit/useNetProfitStatement.ts`
+- [x] **13.4** Crear `src/components/net-profit/NetProfitCard/` — card con grossProfit, operatingExpenses, netProfit, netMargin
+- [x] **13.5** Crear `src/components/net-profit/ProfitLossStatement/` — P&L estructurado por CategoryType
+- [x] **13.6** Crear `app/(private)/companies/[companyId]/net-profit/page.tsx`
 
 ---
 
@@ -280,13 +280,13 @@
 
 > Cálculo de costo unitario por lote, producto y servicio.
 
-- [ ] **14.1** Crear `src/infrastructure/repositories/UnitCostRepositoryImpl.ts`
-- [ ] **14.2** Crear `src/use-cases/unit-cost/useUnitCostByBatch.ts`
-- [ ] **14.3** Crear `src/use-cases/unit-cost/useUnitCostByProduct.ts`
-- [ ] **14.4** Crear `src/use-cases/unit-cost/useUnitCostByService.ts`
-- [ ] **14.5** Crear `src/components/unit-cost/UnitCostCard/` — card con totalCost, quantity, unitCost, currency
-- [ ] **14.6** Crear `src/components/unit-cost/UnitCostTable/` — comparativa por lotes o productos
-- [ ] **14.7** Crear `app/(private)/companies/[companyId]/unit-cost/page.tsx`
+- [x] **14.1** Crear `src/infrastructure/repositories/UnitCostRepositoryImpl.ts`
+- [x] **14.2** Crear `src/use-cases/unit-cost/useUnitCostByBatch.ts`
+- [x] **14.3** Crear `src/use-cases/unit-cost/useUnitCostByProduct.ts`
+- [x] **14.4** Crear `src/use-cases/unit-cost/useUnitCostByService.ts`
+- [x] **14.5** Crear `src/components/unit-cost/UnitCostCard/` — card con totalCost, quantity, unitCost, currency
+- [x] **14.6** Crear `src/components/unit-cost/UnitCostTable/` — comparativa por lotes o productos
+- [x] **14.7** Crear `app/(private)/companies/[companyId]/unit-cost/page.tsx`
 
 ---
 

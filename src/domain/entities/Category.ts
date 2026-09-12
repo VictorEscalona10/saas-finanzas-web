@@ -1,5 +1,6 @@
 export type CategoryType = 'OPERATING' | 'INVESTING' | 'FINANCING';
 export type FlowDirection = 'INFLOW' | 'OUTFLOW';
+export type CategoryItemScope = 'PRODUCT' | 'SERVICE' | 'NONE';
 
 export interface Category {
   id: string;
@@ -12,4 +13,5 @@ export interface Category {
   isDirectCost: boolean;
   isDefault: boolean;
   isRemoved: boolean;
+  itemType: CategoryItemScope;
 }

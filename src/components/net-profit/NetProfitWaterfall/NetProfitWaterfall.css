@@ -1,0 +1,216 @@
+.net-profit-waterfall {
+  background: radial-gradient(circle at 50% 50%,
+    rgba(16, 25, 47, 0.7),
+    rgba(4, 19, 41, 0.9));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: border-color 0.3s ease;
+}
+
+.net-profit-waterfall:hover {
+  border-color: rgba(0, 228, 121, 0.15);
+}
+
+.net-profit-waterfall__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.net-profit-waterfall__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.8);
+  margin: 0;
+}
+
+.net-profit-waterfall__currency-toggle {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.1875rem;
+  background: rgba(4, 19, 41, 0.6);
+  border-radius: 8px;
+}
+
+.net-profit-waterfall__currency-btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(186, 202, 195, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.net-profit-waterfall__currency-btn:hover {
+  color: #d6e3ff;
+}
+
+.net-profit-waterfall__currency-btn--active {
+  background: rgba(0, 228, 121, 0.15);
+  color: #00e479;
+}
+
+.net-profit-waterfall__layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 1.5fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.net-profit-waterfall__section-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(186, 202, 195, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+/* Donut */
+
+.net-profit-waterfall__donut-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.net-profit-waterfall__donut-container {
+  position: relative;
+  width: 100%;
+}
+
+.net-profit-waterfall__donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.net-profit-waterfall__donut-center-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #d6e3ff;
+  line-height: 1.1;
+}
+
+.net-profit-waterfall__donut-center-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.125rem;
+}
+
+.net-profit-waterfall__donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.net-profit-waterfall__donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.7);
+}
+
+.net-profit-waterfall__donut-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.net-profit-waterfall__donut-description {
+  font-size: 0.6875rem;
+  color: rgba(186, 202, 195, 0.45);
+  margin: 0.75rem 0 0;
+  line-height: 1.5;
+}
+
+/* Waterfall chart */
+
+.net-profit-waterfall__chart-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.net-profit-waterfall__chart {
+  width: 100%;
+}
+
+/* Tooltip */
+
+.net-profit-waterfall__tooltip {
+  background: rgba(4, 19, 41, 0.95);
+  border: 1px solid rgba(53, 71, 103, 0.5);
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  backdrop-filter: blur(8px);
+}
+
+.net-profit-waterfall__tooltip-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(186, 202, 195, 0.8);
+  margin-bottom: 0.25rem;
+}
+
+.net-profit-waterfall__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #d6e3ff;
+}
+
+.net-profit-waterfall__tooltip-badge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  background: rgba(0, 228, 121, 0.1);
+  color: #00e479;
+}
+
+.net-profit-waterfall__tooltip-badge--bs {
+  background: rgba(210, 187, 255, 0.1);
+  color: #d2bbff;
+}
+
+@media (max-width: 768px) {
+  .net-profit-waterfall__layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .net-profit-waterfall {
+    padding: 1rem;
+  }
+
+  .net-profit-waterfall__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

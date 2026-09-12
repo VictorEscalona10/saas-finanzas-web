@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useCategoryList } from '@/src/use-cases/category/useCategoryList';
 import { useDeleteCategory } from '@/src/use-cases/category/useDeleteCategory';
 import type { Category } from '@/src/domain/entities/Category';
 import Button from '@/src/components/shared/Button';
 import Skeleton from '@/src/components/shared/Skeleton';
+import ConfirmDialog from '@/src/components/shared/ConfirmDialog';
 import './CategoryList.css';
 
 interface CategoryListProps {
@@ -31,7 +32,8 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
 
 export default function CategoryList({ companyId, onNew, onEdit, onDelete }: CategoryListProps) {
   const { categories, meta, isLoading, error, page, refetch, goToPage } = useCategoryList(companyId);
-  const { deleteCategory, loading: deleting } = useDeleteCategory();
+  const { deleteCategory, loading: deleting, error: deleteError } = useDeleteCategory();
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
 
   const total = meta?.total ?? 0;
   const totalPages = meta?.totalPages ?? 0;
@@ -43,17 +45,24 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
     operating: categories.filter((c) => c.type === 'OPERATING').length,
   };
 
-  const handleDelete = useCallback(async (category: Category) => {
+  const handleDelete = useCallback((category: Category) => {
     if (onDelete) {
       onDelete(category);
     } else {
-      const confirmed = window.confirm(`¿Eliminar categoría "${category.name}"?`);
-      if (confirmed) {
-        const success = await deleteCategory(companyId, category.id);
-        if (success) refetch();
-      }
+      setDeleteTarget(category);
     }
-  }, [companyId, deleteCategory, onDelete, refetch]);
+  }, [onDelete]);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    const success = await deleteCategory(companyId, deleteTarget.id);
+    if (success) {
+      setDeleteTarget(null);
+      refetch();
+    }
+  }, [companyId, deleteTarget, deleteCategory, refetch]);
+
+  console.log('CategoryList', { companyId, categories, isLoading, error, page, total, totalPages, stats, deleteTarget, deleting, deleteError });
 
   return (
     <div className="category-list">
@@ -136,7 +145,7 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
             <tbody>
               {Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="category-list__loading-row">
-                  {Array.from({ length: 7 }).map((__, j) => (
+                  {Array.from({ length: 8 }).map((__, j) => (
                     <td key={j} className="category-list__td">
                       <Skeleton variant="text" />
                     </td>
@@ -165,14 +174,15 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
             <table className="category-list__table">
               <thead>
                 <tr>
-                  <th className="category-list__th">Nombre</th>
-                  <th className="category-list__th">Tipo</th>
-                  <th className="category-list__th">Dirección</th>
-                  <th className="category-list__th">Costo (Cogs)</th>
-                  <th className="category-list__th">Variable</th>
-                  <th className="category-list__th">Directo</th>
-                  <th className="category-list__th">Origen</th>
-                  <th className="category-list__th category-list__th--right">Acciones</th>
+                <th className="category-list__th">Nombre</th>
+                <th className="category-list__th">Tipo</th>
+                <th className="category-list__th">Dirección</th>
+                <th className="category-list__th">Costo (Cogs)</th>
+                <th className="category-list__th">Variable</th>
+                <th className="category-list__th">Directo</th>
+                <th className="category-list__th">Tipo Item</th>
+                <th className="category-list__th">Origen</th>
+                <th className="category-list__th category-list__th--right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,6 +219,11 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
                       )}
                     </td>
                     <td className="category-list__td">
+                      <span className={`category-list__badge category-list__badge--${cat.itemType === 'PRODUCT' ? 'product' : cat.itemType === 'SERVICE' ? 'service' : 'none'}`}>
+                        {cat.itemType === 'PRODUCT' ? 'Producto' : cat.itemType === 'SERVICE' ? 'Servicio' : 'Todos'}
+                      </span>
+                    </td>
+                    <td className="category-list__td">
                       <span className={`category-list__badge category-list__badge--${cat.companyId ? 'own' : 'global'}`}>
                         {cat.companyId ? 'Propia' : 'Global'}
                       </span>
@@ -218,6 +233,8 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
                         className="category-list__action category-list__action--edit"
                         onClick={() => onEdit?.(cat)}
                         aria-label="Editar"
+                        disabled={cat.isDefault}
+                        title={cat.isDefault ? 'No se puede editar una categoría global' : 'Editar'}
                       >
                         <span className="material-symbols-outlined">edit</span>
                       </button>
@@ -277,6 +294,21 @@ export default function CategoryList({ companyId, onNew, onEdit, onDelete }: Cat
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Eliminar Categoría"
+        message={
+          <>
+            ¿Estás seguro de eliminar <strong>{deleteTarget?.name}</strong>?
+            Esta acción no se puede deshacer.
+          </>
+        }
+        loading={deleting}
+        error={deleteError}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

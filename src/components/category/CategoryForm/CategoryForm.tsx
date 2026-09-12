@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, type FormEvent } from 'react';
 import { useCreateCategory } from '@/src/use-cases/category/useCreateCategory';
 import { useUpdateCategory } from '@/src/use-cases/category/useUpdateCategory';
 import type { Category } from '@/src/domain/entities/Category';
-import type { CategoryType, FlowDirection } from '@/src/domain/entities/Category';
+import type { CategoryType, FlowDirection, CategoryItemScope } from '@/src/domain/entities/Category';
 import Button from '@/src/components/shared/Button';
 import './CategoryForm.css';
 
@@ -20,8 +20,8 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ companyId, category, onSave, onCancel, id, hideFooter, onLoadingChange }: CategoryFormProps) {
   const isEdit = !!category;
-  const { createCategory, loading: creating } = useCreateCategory();
-  const { updateCategory, loading: updating } = useUpdateCategory();
+  const { createCategory, loading: creating, error: createError } = useCreateCategory();
+  const { updateCategory, loading: updating, error: updateError } = useUpdateCategory();
 
   const [name, setName] = useState(category?.name ?? '');
   const [type, setType] = useState<CategoryType>(category?.type ?? 'OPERATING');
@@ -29,7 +29,9 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
   const [isCogs, setIsCogs] = useState(category?.isCogs ?? false);
   const [isVariable, setIsVariable] = useState(category?.isVariable ?? false);
   const [isDirectCost, setIsDirectCost] = useState(category?.isDirectCost ?? false);
+  const [itemType, setItemType] = useState<CategoryItemScope>(category?.itemType ?? 'NONE');
   const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const loading = creating || updating;
 
@@ -40,6 +42,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setServerError(null);
 
     if (!name.trim()) {
       setError('El nombre de la categoría es obligatorio');
@@ -56,8 +59,10 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
         isCogs,
         isVariable,
         isDirectCost: flowDirection === 'OUTFLOW' ? isDirectCost : undefined,
+        itemType: flowDirection === 'OUTFLOW' ? itemType : undefined,
       });
       success = result !== null;
+      if (!success) setServerError(updateError);
     } else {
       const result = await createCategory(companyId, {
         name: name.trim(),
@@ -66,14 +71,16 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
         isCogs,
         isVariable,
         isDirectCost: flowDirection === 'OUTFLOW' ? isDirectCost : undefined,
+        itemType: flowDirection === 'OUTFLOW' ? itemType : undefined,
       });
       success = result !== null;
+      if (!success) setServerError(createError);
     }
 
     if (success) {
       onSave();
     }
-  }, [name, type, flowDirection, isCogs, isVariable, isDirectCost, isEdit, category, companyId, createCategory, updateCategory, onSave]);
+  }, [name, type, flowDirection, isCogs, isVariable, isDirectCost, itemType, isEdit, category, companyId, createCategory, updateCategory, onSave, createError, updateError]);
 
   return (
     <div className="category-form-wrapper">
@@ -88,6 +95,13 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
         </div>
 
         <form className="category-form__body" id={id} onSubmit={handleSubmit}>
+          {serverError && (
+            <div className="category-form__server-error">
+              <span className="material-symbols-outlined">error</span>
+              <span>{serverError}</span>
+            </div>
+          )}
+
           <div className="category-form__field">
             <label className="category-form__label" htmlFor="cat-name">Nombre</label>
             <input
@@ -96,7 +110,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
               type="text"
               placeholder="Ej: Ventas, Marketing, Alquiler..."
               value={name}
-              onChange={(e) => { setName(e.target.value); setError(null); }}
+              onChange={(e) => { setName(e.target.value); setError(null); setServerError(null); }}
             />
             {error && <span className="category-form__error">{error}</span>}
           </div>
@@ -109,7 +123,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
                   id="cat-type"
                   className="category-form__select"
                   value={type}
-                  onChange={(e) => setType(e.target.value as CategoryType)}
+                  onChange={(e) => { setType(e.target.value as CategoryType); setServerError(null); }}
                 >
                   <option value="OPERATING">OPERATING</option>
                   <option value="INVESTING">INVESTING</option>
@@ -141,6 +155,8 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
                     setIsCogs(false);
                     setIsVariable(false);
                     setIsDirectCost(false);
+                    setItemType('NONE');
+                    setServerError(null);
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>trending_up</span>
@@ -149,7 +165,7 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
                 <button
                   type="button"
                   className={`category-form__segmented-btn${flowDirection === 'OUTFLOW' ? ' category-form__segmented-btn--active category-form__segmented-btn--outflow' : ''}`}
-                  onClick={() => setFlowDirection('OUTFLOW')}
+                  onClick={() => { setFlowDirection('OUTFLOW'); setServerError(null); }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>trending_down</span>
                   <span>OUTFLOW</span>
@@ -212,6 +228,23 @@ export default function CategoryForm({ companyId, category, onSave, onCancel, id
                 />
                 <span className="category-form__switch-slider" />
               </label>
+            </div>
+
+            <div className="category-form__field">
+              <label className="category-form__label" htmlFor="cat-item-type">Tipo de Item Asociado</label>
+              <div className="category-form__select-wrapper">
+                <select
+                  id="cat-item-type"
+                  className="category-form__select"
+                  value={itemType}
+                  onChange={(e) => setItemType(e.target.value as CategoryItemScope)}
+                >
+                  <option value="NONE">Todos</option>
+                  <option value="PRODUCT">Producto</option>
+                  <option value="SERVICE">Servicio</option>
+                </select>
+                <span className="material-symbols-outlined category-form__select-arrow">expand_more</span>
+              </div>
             </div>
             </>
           )}

@@ -19,29 +19,35 @@ export function useMyCompanies() {
     error: null,
   });
 
-  const fetchCompanies = useCallback(async () => {
-    if (!session || !isAuthenticated) return;
+  const fetchCompanies = useCallback(async (): Promise<Company[]> => {
+    if (!session || !isAuthenticated) return [];
 
     const token = (session as { access_token: string }).access_token;
     const repo = new CompanyRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const companies = await repo.listMyCompanies();
-      setState({ companies, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar compañías';
-      setState({ companies: [], isLoading: false, error: message });
-    }
+    return repo.listMyCompanies();
   }, [session, isAuthenticated]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const companies = await fetchCompanies();
+        setState({ companies, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar compañías';
+        setState({ companies: [], isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, fetchCompanies]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchCompanies();
+      void refetch();
     }
-  }, [sessionLoading, fetchCompanies]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchCompanies };
+  return { ...state, refetch };
 }

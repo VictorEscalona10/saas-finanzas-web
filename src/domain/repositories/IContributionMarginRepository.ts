@@ -7,6 +7,7 @@ export interface ContributionGlobal {
   totalMarginBs: number;
   globalMarginRatio: number;
   globalMarginRatioBs: number;
+  grouped: ContributionTrendPoint[];
 }
 
 export interface UnitAnalysis {
@@ -38,7 +39,9 @@ export interface ContributionProduct {
   itemName: string;
   itemType: string;
   totalUnitsSold: number;
-  period: ContributionPeriod;
+  totalServicesSold: number;
+  batchQuantity?: number;
+  period?: ContributionPeriod;
   financials: ProductFinancials;
   unitAnalysis: UnitAnalysis;
 }
@@ -55,5 +58,4 @@ export interface IContributionMarginRepository {
   getProductGlobal(itemId: string, companyId: string, startDate: string, endDate: string): Promise<ContributionProduct>;
   getProductByBatch(batchId: string, companyId: string): Promise<ContributionProduct>;
   getService(itemId: string, companyId: string, startDate: string, endDate: string): Promise<ContributionProduct>;
-  getTrend(companyId: string, startDate: string, endDate: string): Promise<ContributionTrendPoint[]>;
 }

@@ -1,53 +1,40 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import TransactionList from '@/src/components/transaction/TransactionList';
-import TransactionForm from '@/src/components/transaction/TransactionForm';
-import TransactionDrawer from '@/src/components/transaction/TransactionDrawer';
 import TransactionFilters from '@/src/components/transaction/TransactionFilters';
 import TransactionDetailModal from '@/src/components/transaction/TransactionDetailModal';
 import { useDeleteTransaction } from '@/src/use-cases/transaction/useDeleteTransaction';
-import Button from '@/src/components/shared/Button';
 import type { Transaction } from '@/src/domain/entities/Transaction';
 import type { TransactionFiltersState } from '@/src/components/transaction/TransactionFilters/TransactionFilters';
 
+const EMPTY_FILTERS: TransactionFiltersState = {
+  startDate: '',
+  endDate: '',
+  categoryId: null,
+  status: 'all',
+  itemId: null,
+};
+
 export default function TransactionsPage() {
   const params = useParams<{ companyId: string }>();
+  const router = useRouter();
   const companyId = params.companyId;
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
+  const [filters, setFilters] = useState<TransactionFiltersState>(EMPTY_FILTERS);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const { deleteTransaction } = useDeleteTransaction();
+  const { deleteTransaction, error: deleteError } = useDeleteTransaction();
 
   const handleNew = useCallback(() => {
-    setEditingTransaction(undefined);
-    setDrawerOpen(true);
-  }, []);
-
-  const handleEdit = useCallback((transaction: Transaction) => {
-    setEditingTransaction(transaction);
-    setDrawerOpen(true);
-  }, []);
+    router.push(`/${companyId}/transactions/new`);
+  }, [companyId, router]);
 
   const handleView = useCallback((transaction: Transaction) => {
     setViewingTransaction(transaction);
     setDetailOpen(true);
-  }, []);
-
-  const handleSave = useCallback(() => {
-    setDrawerOpen(false);
-    setEditingTransaction(undefined);
-    setRefreshKey((k) => k + 1);
-  }, []);
-
-  const handleCancel = useCallback(() => {
-    setDrawerOpen(false);
-    setEditingTransaction(undefined);
   }, []);
 
   const handleDetailEdit = useCallback(() => {
@@ -55,13 +42,12 @@ export default function TransactionsPage() {
     setDetailOpen(false);
     setViewingTransaction(null);
     if (tx) {
-      setEditingTransaction(tx);
-      setDrawerOpen(true);
+      router.push(`/${companyId}/transactions/${tx.id}/edit`);
     }
-  }, [viewingTransaction]);
+  }, [viewingTransaction, companyId, router]);
 
-  const handleDelete = useCallback(async () => {
-    if (!viewingTransaction) return;
+  const handleDelete = useCallback(async (): Promise<boolean> => {
+    if (!viewingTransaction) return false;
     setDeleting(true);
     const success = await deleteTransaction(companyId, viewingTransaction.id);
     if (success) {
@@ -70,10 +56,11 @@ export default function TransactionsPage() {
       setRefreshKey((k) => k + 1);
     }
     setDeleting(false);
+    return success;
   }, [companyId, deleteTransaction, viewingTransaction]);
 
-  const handleFilter = useCallback((_filters: TransactionFiltersState) => {
-    setRefreshKey((k) => k + 1);
+  const handleFilter = useCallback((nextFilters: TransactionFiltersState) => {
+    setFilters(nextFilters);
   }, []);
 
   return (
@@ -81,45 +68,12 @@ export default function TransactionsPage() {
       <TransactionFilters companyId={companyId} onFilter={handleFilter} />
 
       <TransactionList
-        key={refreshKey}
+        key={`${filters.startDate}|${filters.endDate}|${filters.categoryId ?? ''}|${filters.status}|${refreshKey}`}
         companyId={companyId}
+        filters={filters}
         onNew={handleNew}
         onView={handleView}
       />
-
-      <TransactionDrawer
-        open={drawerOpen}
-        onClose={handleCancel}
-        disableClose={saving}
-        title={editingTransaction ? 'Editar Transacción' : 'Nueva Transacción'}
-        subtitle={editingTransaction ? 'Modifica los datos de la transacción seleccionada.' : 'Ingrese los detalles de la operación.'}
-        footer={
-          <>
-            <Button variant="outline" size="lg" onClick={handleCancel} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              type="submit"
-              form="transaction-form"
-              loading={saving}
-            >
-              {saving ? 'Guardando...' : 'Guardar'}
-            </Button>
-          </>
-        }
-      >
-        <TransactionForm
-          companyId={companyId}
-          transaction={editingTransaction}
-          onSave={handleSave}
-          onCancel={handleCancel}
-          id="transaction-form"
-          hideFooter
-          onLoadingChange={setSaving}
-        />
-      </TransactionDrawer>
 
       <TransactionDetailModal
         open={detailOpen}
@@ -128,6 +82,7 @@ export default function TransactionsPage() {
         onEdit={handleDetailEdit}
         onDelete={handleDelete}
         deleting={deleting}
+        deleteError={deleteError}
       />
     </>
   );

@@ -161,6 +161,22 @@
   font-weight: 600;
 }
 
+.contribution-trend__bar-group {
+  transition: opacity 0.15s ease;
+}
+
+.contribution-trend__bar-group:hover {
+  opacity: 1;
+}
+
+.contribution-trend__bar rect {
+  transition: opacity 0.15s ease;
+}
+
+.contribution-trend__bar rect:hover {
+  opacity: 1 !important;
+}
+
 @media (max-width: 640px) {
   .contribution-trend {
     padding: 1rem;

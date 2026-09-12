@@ -347,6 +347,94 @@ export const config = {
 };
 ```
 
+### 1.8 Regla de Estado y Effects (`react-hooks/set-state-in-effect`)
+
+> **Regla de oro:** NO llamar `setState` de forma **síncrona** dentro del cuerpo de un `useEffect`.
+
+`eslint-plugin-react-hooks@7.1.1` (viene con `eslint-config-next@16`) introduce la regla estricta `react-hooks/set-state-in-effect`, que prohíbe actualizar estado síncronamente dentro de un effect porque provoca un re-render "en cascada" (primero con valor desactualizado, luego con el nuevo). Si el lint está configurado como error, **rompe CI/build**.
+
+#### Cuándo NO usar un effect para actualizar estado
+
+1. **Derivar durante el render** (no necesitas estado ni effect):
+   ```typescript
+   // ❌ Mal
+   const [fullName, setFullName] = useState('');
+   useEffect(() => { setFullName(`${first} ${last}`); }, [first, last]);
+
+   // ✅ Bien
+   const fullName = `${first} ${last}`;
+   ```
+
+2. **Lógica de eventos** → va en el event handler, NO en un effect (un effect no sabe qué acción del usuario lo disparó):
+   ```typescript
+   // ❌ Mal: enviar POST en un effect cuando debería ser en el click
+   // ✅ Bien: setState en el onClick / onSubmit
+   ```
+
+3. **Resetear estado al cambiar un prop** → usar `key` de React o el patrón `prevOpen` (ajustar durante render), NO un effect:
+   ```typescript
+   // ✅ Patrón prevOpen (ajustar estado durante render, NO en un effect)
+   const [prevOpen, setPrevOpen] = useState(open);
+   if (open !== prevOpen) {
+     setPrevOpen(open);
+     // ...ajustar otros estados aquí (React re-renderiza inmediatamente)
+   }
+   ```
+
+#### Cuándo SÍ está permitido usar un effect
+
+- **Sincronizar con un sistema externo**: red/network, APIs del navegador, librerías de terceros (jQuery, canvas, etc.).
+- **El `setState` asíncrono** (dentro de un `await`/`.then`/`setTimeout`/callback) **NO dispara** esta regla y es legítimo.
+
+#### Patrón obligatorio para overlays animados (Modal / Drawers)
+
+Los modales y drawers necesitan una **animación de salida** antes de desmontarse. Está **PROHIBIDO** sincronizar `mounted`/`closing` con el prop `open` mediante `setState` síncrono en un effect.
+
+**Usar el hook `usePresence`** (o el patrón `prevOpen`) para gestionar montaje + animación:
+
+```typescript
+export function usePresence(open: boolean, exitDuration: number) {
+  const [isVisible, setIsVisible] = useState(open);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [prevOpen, setPrevOpen] = useState(open);
+
+  // Ajustar durante render (sin setState síncrono en effect)
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setIsVisible(true);
+      setIsAnimating(false);
+    } else {
+      setIsAnimating(true); // iniciar animación de salida
+    }
+  }
+
+  // Desmontaje tras la animación: el setState va en un callback (asíncrono) → OK
+  useEffect(() => {
+    if (!isAnimating) return;
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+      setIsAnimating(false);
+    }, exitDuration);
+    return () => clearTimeout(timer);
+  }, [isAnimating, exitDuration]);
+
+  return { isVisible, isAnimating };
+}
+```
+
+**Reglas para componentes overlay:**
+- ✅ Derivar el estado durante el render con el patrón `prevOpen`
+- ✅ Los `setTimeout` de desmontaje van en callbacks (no síncronos en el effect)
+- ✅ El `Modal` debe desmontarse también cuando `open` pasa a `false` (no solo por su botón de cierre interno)
+- ❌ Prohibido `setMounted(true)` / `setMounted(false)` síncrono dentro del `useEffect`
+
+#### Verificación
+
+- `npx tsc --noEmit` → sin errores
+- `npx eslint` sobre los archivos modificados → sin errores de `react-hooks/set-state-in-effect`
+- `npm run lint` → sin errores
+
 ---
 
 ## 2. Flujo de Autenticación

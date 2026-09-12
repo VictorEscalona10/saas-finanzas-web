@@ -1,5 +1,5 @@
 import { createApiClientWithToken } from '@/src/infrastructure/api/apiClient';
-import type { ITransactionRepository, CreateTransactionDto, UpdateTransactionDto } from '@/src/domain/repositories/ITransactionRepository';
+import type { ITransactionRepository, CreateTransactionDto, UpdateTransactionDto, TransactionListFilters } from '@/src/domain/repositories/ITransactionRepository';
 import type { Transaction } from '@/src/domain/entities/Transaction';
 import type { PaginatedResult } from '@/src/domain/entities/Pagination';
 
@@ -10,9 +10,15 @@ export class TransactionRepositoryImpl implements ITransactionRepository {
     this.api = createApiClientWithToken(token);
   }
 
-  async list(companyId: string, page = 1, limit = 50): Promise<PaginatedResult<Transaction>> {
+  async list(companyId: string, page = 1, limit = 50, filters?: TransactionListFilters): Promise<PaginatedResult<Transaction>> {
+    const params: Record<string, string | number> = { page, limit };
+    if (filters?.startDate) params.startDate = filters.startDate;
+    if (filters?.endDate) params.endDate = filters.endDate;
+    if (filters?.categoryId) params.categoryId = filters.categoryId;
+    if (filters?.status) params.status = filters.status;
+    if (filters?.itemId) params.itemId = filters.itemId;
     const { data } = await this.api.get<PaginatedResult<Transaction>>(`/transaction/get-all/${companyId}`, {
-      params: { page, limit },
+      params,
     });
     return data;
   }

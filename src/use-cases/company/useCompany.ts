@@ -19,29 +19,35 @@ export function useCompany(id: string | undefined) {
     error: null,
   });
 
-  const fetchCompany = useCallback(async () => {
-    if (!session || !isAuthenticated || !id) return;
+  const fetchCompany = useCallback(async (): Promise<Company | null> => {
+    if (!session || !isAuthenticated || !id) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new CompanyRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const company = await repo.getById(id);
-      setState({ company, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar compañía';
-      setState({ company: null, isLoading: false, error: message });
-    }
+    return repo.getById(id);
   }, [session, isAuthenticated, id]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !id) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const company = await fetchCompany();
+        setState({ company, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar compañía';
+        setState({ company: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, id, fetchCompany]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchCompany();
+      void refetch();
     }
-  }, [sessionLoading, fetchCompany]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchCompany };
+  return { ...state, refetch };
 }

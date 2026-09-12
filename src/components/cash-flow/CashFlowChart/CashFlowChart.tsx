@@ -35,15 +35,22 @@ function GlobalDonut({
   const total = allCategories.reduce((s, c) => s + Math.abs(c.cat.amount), 0);
   if (total === 0) return <div className="cash-flow-chart__empty">Sin datos</div>;
 
-  let offset = 0;
+  const segmentOffsets = allCategories.map(({ cat }) =>
+    (Math.abs(cat.amount) / total) * DONUT_CIRCUMFERENCE,
+  );
+  const cumulativeOffsets = segmentOffsets.reduce<number[]>((acc, len) => {
+    acc.push((acc.at(-1) ?? 0) + len);
+    return acc;
+  }, []);
 
   return (
     <div className="cash-flow-chart__donut-row">
       <div className="cash-flow-chart__donut-wrapper">
         <svg className="cash-flow-chart__donut" viewBox={`0 0 ${DONUT_VIEWBOX} ${DONUT_VIEWBOX}`}>
           <circle className="cash-flow-chart__donut-bg" cx={DONUT_VIEWBOX / 2} cy={DONUT_VIEWBOX / 2} r={DONUT_RADIUS} />
-          {allCategories.map(({ cat }) => {
-            const length = (Math.abs(cat.amount) / total) * DONUT_CIRCUMFERENCE;
+          {allCategories.map(({ cat }, index) => {
+            const length = segmentOffsets[index];
+            const offset = cumulativeOffsets[index] - length;
             const seg = (
               <circle
                 key={cat.name}
@@ -56,7 +63,6 @@ function GlobalDonut({
                 strokeDashoffset={-offset}
               />
             );
-            offset += length;
             return seg;
           })}
         </svg>

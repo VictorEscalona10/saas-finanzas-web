@@ -19,29 +19,35 @@ export function useContributionByBatch(batchId: string | undefined, companyId: s
     error: null,
   });
 
-  const fetchBatch = useCallback(async () => {
-    if (!session || !isAuthenticated || !companyId || !batchId) return;
+  const fetchBatch = useCallback(async (): Promise<ContributionProduct | null> => {
+    if (!session || !isAuthenticated || !companyId || !batchId) return null;
 
     const token = (session as { access_token: string }).access_token;
     const repo = new ContributionMarginRepositoryImpl(token);
 
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-    try {
-      const data = await repo.getProductByBatch(batchId, companyId);
-      setState({ data, isLoading: false, error: null });
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Error al cargar margen de contribución del lote';
-      setState({ data: null, isLoading: false, error: message });
-    }
+    return repo.getProductByBatch(batchId, companyId);
   }, [session, isAuthenticated, companyId, batchId]);
+
+  const refetch = useCallback(() => {
+    void (async () => {
+      if (!session || !isAuthenticated || !companyId || !batchId) return;
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const data = await fetchBatch();
+        setState({ data, isLoading: false, error: null });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Error al cargar margen de contribución del lote';
+        setState({ data: null, isLoading: false, error: message });
+      }
+    })();
+  }, [session, isAuthenticated, companyId, batchId, fetchBatch]);
 
   useEffect(() => {
     if (!sessionLoading) {
-      fetchBatch();
+      void refetch();
     }
-  }, [sessionLoading, fetchBatch]);
+  }, [sessionLoading, refetch]);
 
-  return { ...state, refetch: fetchBatch };
+  return { ...state, refetch };
 }

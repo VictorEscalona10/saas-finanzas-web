@@ -36,14 +36,9 @@ export default function Home() {
       <nav className="landing-nav">
         <div className="landing-nav__inner">
           <div className="landing-nav__brand">
-            <div className="landing-nav__logo">
-              <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L3 7V12C3 18 12 22 12 22C12 22 21 18 21 12V7L12 2Z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M12 8V16" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-                <path d="M8 12H16" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
-            <span className="landing-nav__title">FinanzaVzla</span>
+            <Link href="/">
+              <img src="/logo.png" alt="FinanzaVzla" className="landing-nav__logo-img" />
+            </Link>
           </div>
           <nav className="landing-nav__links">
             <a className="landing-nav__link landing-nav__link--active" href="#features">Funcionalidades</a>
@@ -413,11 +408,7 @@ export default function Home() {
           <div className="landing-footer__grid">
             <div>
               <div className="landing-footer__brand">
-                <div className="landing-footer__brand-icon">
-                  <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L3 7V12C3 18 12 22 12 22C12 22 21 18 21 12V7L12 2Z" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
+                <img src="/logo.png" alt="FinanzaVzla" className="landing-footer__brand-logo" />
                 <span className="landing-footer__brand-name">FinanzaVzla</span>
               </div>
               <p className="landing-footer__brand-desc">

@@ -6,6 +6,7 @@ import { useDeleteItem } from '@/src/use-cases/item/useDeleteItem';
 import type { Item } from '@/src/domain/entities/Item';
 import Button from '@/src/components/shared/Button';
 import Skeleton from '@/src/components/shared/Skeleton';
+import ConfirmDialog from '@/src/components/shared/ConfirmDialog';
 import ItemTypeFilter from '@/src/components/item/ItemTypeFilter';
 import './ItemList.css';
 
@@ -31,8 +32,10 @@ function getPageNumbers(current: number, total: number): (number | 'ellipsis')[]
 
 export default function ItemList({ companyId, onNew, onEdit }: ItemListProps) {
   const [typeFilter, setTypeFilter] = useState<ItemTypeFilterType>('all');
-  const { items, meta, isLoading, error, page, refetch, goToPage } = useItemList(companyId, typeFilter);
-  const { deleteItem, loading: deleting } = useDeleteItem();
+  const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Item | null>(null);
+  const { items, meta, isLoading, error, page, refetch, goToPage } = useItemList(companyId, typeFilter, search);
+  const { deleteItem, loading: deleting, error: deleteError } = useDeleteItem();
 
   const total = meta?.total ?? 0;
   const totalPages = meta?.totalPages ?? 0;
@@ -44,14 +47,18 @@ export default function ItemList({ companyId, onNew, onEdit }: ItemListProps) {
     return { products, services, totalStock };
   }, [items]);
 
-  const handleDelete = useCallback(async (item: Item) => {
-    if (!companyId) return;
-    const confirmed = window.confirm(`¿Eliminar item "${item.name}"?`);
-    if (confirmed) {
-      const success = await deleteItem(item.id, companyId);
-      if (success) refetch();
+  const handleDelete = useCallback((item: Item) => {
+    setDeleteTarget(item);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!companyId || !deleteTarget) return;
+    const success = await deleteItem(deleteTarget.id, companyId);
+    if (success) {
+      setDeleteTarget(null);
+      refetch();
     }
-  }, [companyId, deleteItem, refetch]);
+  }, [companyId, deleteTarget, deleteItem, refetch]);
 
   const formatPrice = (price: number) => {
     return `$ ${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -146,7 +153,8 @@ export default function ItemList({ companyId, onNew, onEdit }: ItemListProps) {
               className="item-list__search-input"
               type="text"
               placeholder="Buscar item..."
-              readOnly
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
@@ -297,6 +305,21 @@ export default function ItemList({ companyId, onNew, onEdit }: ItemListProps) {
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Eliminar Item"
+        message={
+          <>
+            ¿Estás seguro de eliminar <strong>{deleteTarget?.name}</strong>?
+            Esta acción no se puede deshacer.
+          </>
+        }
+        loading={deleting}
+        error={deleteError}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

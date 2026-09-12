@@ -1,4 +1,4 @@
-import { Category, CategoryType, FlowDirection } from '@/src/domain/entities/Category';
+import { Category, CategoryType, FlowDirection, CategoryItemScope } from '@/src/domain/entities/Category';
 import { PaginatedResult } from '@/src/domain/entities/Pagination';
 import { FuzzySearchResult } from '@/src/domain/entities/FuzzySearch';
 
@@ -9,6 +9,7 @@ export interface CreateCategoryDto {
   isVariable?: boolean;
   isCogs: boolean;
   isDirectCost?: boolean;
+  itemType?: CategoryItemScope;
 }
 
 export interface UpdateCategoryDto {
@@ -18,6 +19,7 @@ export interface UpdateCategoryDto {
   isVariable?: boolean;
   isCogs: boolean;
   isDirectCost?: boolean;
+  itemType?: CategoryItemScope;
 }
 
 export interface ICategoryRepository {

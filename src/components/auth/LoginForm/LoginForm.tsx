@@ -35,12 +35,9 @@ export default function LoginForm() {
     <div className="login-page">
       <div className="login-page__form-panel">
         <div className="login-page__brand">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="6" fill="#059669" />
-            <path d="M14 6L14 22M14 6L9 11M14 6L19 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M8 18H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          <span className="login-page__brand-name">FinanzaVzla</span>
+          <Link href="/" className="login-page__brand-link">
+            <img src="/logo.png" alt="FinanzaVzla" className="login-page__brand-logo" />
+          </Link>
         </div>
 
         <div className="login-page__welcome">

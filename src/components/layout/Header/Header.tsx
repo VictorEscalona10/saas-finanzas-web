@@ -11,6 +11,8 @@ import './Header.css';
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
+  editorMode?: boolean;
+  onBack?: () => void;
   companyId?: string;
   companyName?: string;
   companies?: Company[];
@@ -19,6 +21,8 @@ interface HeaderProps {
 
 export default function Header({
   onToggleSidebar,
+  editorMode = false,
+  onBack,
   companyId,
   companyName,
   companies = [],
@@ -65,12 +69,21 @@ export default function Header({
   return (
     <header className="header">
       <div className="header__left">
-        <button className="header__menu-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
+        {editorMode ? (
+          <button
+            className="header__back-btn"
+            onClick={onBack}
+            aria-label="Volver a las hojas de cálculo"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+        ) : (
+          <button className="header__menu-btn" onClick={onToggleSidebar} aria-label="Toggle sidebar">
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+        )}
 
-        <span className="header__brand-icon material-symbols-outlined">shield</span>
-        <span className="header__brand">FinanzaVzla</span>
+        <img src="/logo.png" alt="FinanzaVzla" className="header__brand-logo" />
 
         {companyId && (
           <div className="header__company-selector" ref={companyRef}>

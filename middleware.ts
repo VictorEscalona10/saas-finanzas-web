@@ -16,12 +16,11 @@ const PRIVATE_ROUTES = [
   '/net-profit',
   '/unit-cost',
   '/price-margin',
-  '/finance-chat',
   '/profile',
   '/settings',
 ];
 
-const COMPANY_ROUTE_PATTERN = /^\/[^/]+\/(dashboard|categories|products|transactions|batches|cash-flow|contribution-margin|balance-point|gross-profit|net-profit|unit-cost|price-margin|finance-chat)/;
+const COMPANY_ROUTE_PATTERN = /^\/[^/]+\/(dashboard|categories|products|transactions|batches|cash-flow|contribution-margin|balance-point|gross-profit|net-profit|unit-cost|price-margin)/;
 
 export async function middleware(req: NextRequest) {
   const { supabase, headers } = createClient(req);
